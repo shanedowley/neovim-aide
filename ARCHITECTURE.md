@@ -494,6 +494,30 @@ Windows is currently unsupported.
 
 ---
 
+# Repository Boundary
+
+Neovim-Codex RC1.0 ships as a curated engineering environment.
+
+The repository contains:
+
+- the core Neovim-Codex AIES subsystem
+- supporting Neovim IDE infrastructure
+- operational tooling
+- demo assets
+- workflow documentation
+
+The operational support boundary primarily applies to:
+
+- Codex workflows
+- validation systems
+- observability systems
+- recovery systems
+- C/C++ engineering workflows
+
+Supporting Neovim UX components may evolve independently from the core AIES subsystem.
+
+--
+
 # Architectural Non-Goals
 
 Neovim-Codex is NOT attempting to become:
