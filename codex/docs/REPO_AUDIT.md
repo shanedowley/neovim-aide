@@ -117,7 +117,7 @@ Removed hardcoded user-specific filesystem paths.
 Replaced with portable path expansion:
 
 ```lua
-vim.fn.expand("~/Documents/Coding/c-projects")
+vim.env.NVIM_CODEX_PROJECT_ROOT
 ```
 
 Verified:
@@ -192,4 +192,3 @@ Additional OSS hardening work remains planned around:
 - semantic versioning
 
 However current repository hygiene is considered suitable for RC1.0 public candidate preparation.
-

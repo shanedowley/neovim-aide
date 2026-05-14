@@ -178,6 +178,28 @@ if ok_cmp then
 	caps = cmp_nvim_lsp.default_capabilities(caps)
 end
 
+local function project_override_root(fname)
+	local env_root = vim.env.NVIM_CODEX_PROJECT_ROOT
+
+	if env_root and env_root ~= "" then
+		local expanded = vim.fn.expand(env_root)
+		if fname:sub(1, #expanded) == expanded then
+			return expanded
+		end
+	end
+
+	return nil
+end
+
+local function detect_project_root(fname)
+	return vim.fs.root(fname, {
+		"compile_commands.json",
+		"compile_flags.txt",
+		"CMakeLists.txt",
+		".git",
+	}) or vim.fs.dirname(fname)
+end
+
 local function clangd_root(bufnr, on_dir)
 	local fname = vim.api.nvim_buf_get_name(bufnr)
 
@@ -186,20 +208,7 @@ local function clangd_root(bufnr, on_dir)
 		return
 	end
 
-	local projects = vim.fn.expand("~/Documents/Coding/c-projects")
-	if fname:sub(1, #projects) == projects then
-		on_dir(projects)
-		return
-	end
-
-	local root = vim.fs.root(fname, {
-		"compile_commands.json",
-		"compile_flags.txt",
-		"CMakeLists.txt",
-		".git",
-	})
-
-	on_dir(root or vim.fs.dirname(fname))
+	on_dir(project_override_root(fname) or detect_project_root(fname))
 end
 
 local clangd_cfg = {
@@ -219,19 +228,7 @@ else
 			cmd = { "clangd" },
 			capabilities = caps,
 			root_dir = function(fname)
-				local projects = vim.fn.expand("~/Documents/Coding/c-projects")
-				if fname:sub(1, #projects) == projects then
-					return projects
-				end
-
-				local root = vim.fs.root(fname, {
-					"compile_commands.json",
-					"compile_flags.txt",
-					"CMakeLists.txt",
-					".git",
-				})
-
-				return root or vim.fs.dirname(fname)
+				return project_override_root(fname) or detect_project_root(fname)
 			end,
 			filetypes = { "c", "cpp", "objc", "objcpp" },
 		})
