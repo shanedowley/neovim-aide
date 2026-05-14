@@ -98,7 +98,7 @@ Without Codex CLI, AI-assisted workflows will be unavailable.
 ## 1. Clone the repository
 
 ```bash
-git clone <your-repo-url> ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
 ```
 
 ---

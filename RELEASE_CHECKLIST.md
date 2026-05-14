@@ -27,7 +27,7 @@ Status Legend:
 - [x] CONTRIBUTING.md
 - [x] LICENSE
 - [x] Demo workflow documentation
-- [ ] Replace `<your-repo-url>` placeholders
+- [x] Replace `<your-repo-url>` placeholders
 - [ ] Final documentation proofreading pass
 
 ---

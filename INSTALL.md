@@ -103,7 +103,7 @@ The bootstrap system validates this contract.
 Recommended installation location:
 
 ```bash
-git clone <your-repo-url> ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
 ```
 
 ---
