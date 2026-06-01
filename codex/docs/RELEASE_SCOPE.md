@@ -59,10 +59,10 @@ Release 1.1 is not:
 
 Neovim-Codex Release 1.1 is intended for:
 
-- engineers who prefer explicit control over AI workflows
-- developers comfortable with terminal and Neovim environments
+- users who prefer explicit control over AI workflows
+- users comfortable with terminal and Neovim environments
 - users who value validation, observability, and recoverability
-- engineers working primarily in C/C++ and Lua workflows
+- users working primarily in C/C++ workflows
 - users who prefer inspectable workflows over autonomous coding systems
 
 Release 1.1 is likely not suitable for:
