@@ -31,7 +31,7 @@ return {
 		highlight = {
 			enable = true,
 			disable = function(lang, buf)
-				if lang == "markdown" or lang == "text" then
+				if lang == "markdown" or lang == "markdown_inline" or lang == "text" then
 					return true
 				end
 

@@ -233,9 +233,6 @@ return {
 				},
 				{
 					"<leader>lh",
-					function()
-						vim.lsp.buf.hover()
-					end,
 					desc = "Hover docs",
 					mode = "n",
 				},
