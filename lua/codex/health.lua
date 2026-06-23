@@ -267,14 +267,41 @@ local function check_prompt_files(results)
 		end
 	end
 
+	local ok_store, store = pcall(require, "codex.prompt_store")
+	if not ok_store or not store or type(store.get) ~= "function" then
+		add_result(results, "prompt file: explain", "FAIL", "prompt_store unavailable")
+		return
+	end
+
+	local ok_c, explain_c, _, source_c = pcall(store.get, "explain_c")
+	local ok_generic, explain_generic, _, source_generic = pcall(store.get, "explain_generic")
+
+	local has_explain_c = ok_c and type(explain_c) == "string" and vim.trim(explain_c) ~= ""
+	local has_explain_generic = ok_generic and type(explain_generic) == "string" and vim.trim(explain_generic) ~= ""
+
 	if found then
-		add_result(results, "prompt file: explain", "PASS", "using " .. found)
+		add_result(results, "prompt file: explain", "PASS", "external file available: " .. found)
+	elseif has_explain_c or has_explain_generic then
+		local sources = {}
+		if has_explain_c then
+			sources[#sources + 1] = "explain_c=" .. tostring(source_c)
+		end
+		if has_explain_generic then
+			sources[#sources + 1] = "explain_generic=" .. tostring(source_generic)
+		end
+
+		add_result(
+			results,
+			"prompt file: explain",
+			"PASS",
+			"using prompt_store fallback: " .. table.concat(sources, ", ")
+		)
 	else
 		add_result(
 			results,
 			"prompt file: explain",
-			"WARN",
-			"missing/unreadable; checked explain.md and explain_c.md; fallback should apply"
+			"FAIL",
+			"no readable explain prompt file and no usable prompt_store fallback"
 		)
 	end
 end
@@ -604,6 +631,15 @@ function M.show()
 	local results = M.run_checks()
 	local overall = overall_status(results)
 	local counts = count_statuses(results)
+
+	local ok_state, health_state = pcall(require, "codex.health_state")
+	if ok_state and health_state and type(health_state.set) == "function" then
+		if overall == "FAIL" then
+			health_state.set("blocked", "✖ Codex Blocked")
+		else
+			health_state.set("ready", "✓ Codex Ready")
+		end
+	end
 
 	local level = vim.log.levels.INFO
 	if overall == "DEGRADED" then
