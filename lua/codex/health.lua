@@ -510,6 +510,7 @@ function M.run_checks()
 	check_module(results, "codex.cli", true)
 	check_module(results, "codex.failure", true)
 	check_module(results, "codex.latency", true)
+	check_module(results, "codex.window", true)
 
 	-- Optional JavaScript debug/build capability
 	check_command_version(results, "node", { "node", "--version" }, false)
