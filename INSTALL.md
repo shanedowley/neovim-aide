@@ -546,8 +546,8 @@ No silent auto-apply workflow exists.
 | Document                | Purpose                                     |
 | ----------------------- | ------------------------------------------- |
 | `README.md`             | Project overview and quick start            |
-| `ARCHITECTURE.md`       | System architecture and operational model   |
-| `CONTRIBUTING.md`       | Contribution guidelines                     |
-| `RELEASE_NOTES_R1_1.md` | Release 1.1 changes and upgrade information |
+| `docs/ARCHITECTURE.md`       | System architecture and operational model   |
+| `docs/CONTRIBUTING.md`       | Contribution guidelines                     |
+| `docs/releases/RELEASE_NOTES_R1_1_FULL.md` | Release 1.1 changes and upgrade information |
 | `LICENSE`               | License information                         |
 

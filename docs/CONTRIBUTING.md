@@ -115,9 +115,9 @@ Significant behavioural or architectural changes should include documentation up
 Relevant documentation may include:
 
 - `README.md`
-- `RELEASE_NOTES_R1_1.md`
+- `docs/releases/RELEASE_NOTES_R1_1_FULL.md`
 - `RELEASE_SCOPE.md`
-- `ARCHITECTURE.md`
+- `docs/ARCHITECTURE.md`
 - `OPERATIONS.md`
 - `COMMANDS.md`
 - `REPO_AUDIT.md`

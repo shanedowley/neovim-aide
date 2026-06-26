@@ -468,16 +468,21 @@ You have now successfully executed your first AI-assisted workflow.
 
 ## Architecture
 
-- `ARCHITECTURE.md` — architectural principles, workflow model, health model, state model, and operational design
+- `docs/ARCHITECTURE.md` — architectural principles, workflow model, health model, state model, and operational design
 
 ## Operations
 
 - `codex/docs/OPERATIONS.md` — operational procedures, diagnostics, recovery, and maintenance
 
+## Contributing
+
+- `codex/docs/CONTRIBUTING.md` —
+
 ## Release Documentation
 
-- `RELEASE_NOTES_RC1_0.md` — historical Release Candidate 1.0 notes
-- `codex/docs/RELEASE_SCOPE.md` — release scope and backlog tracking
+- `docs/releases/RELEASE_NOTES_RC1_0.md` — historical Release Candidate 1.0 notes
+- `docs/releases/RELEASE_NOTES_R1_1_FULL.md` — historical Release 1.1 notes
+- `docs/releases/R1_2_BACKLOG.md` — release scope and backlog tracking
 
 ## Repository Documentation
 
