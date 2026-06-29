@@ -31,6 +31,12 @@ return {
 		highlight = {
 			enable = true,
 			disable = function(lang, buf)
+				local ft = vim.bo[buf].filetype
+
+				if ft == "NvimTree" then
+					return true
+				end
+
 				if lang == "markdown" or lang == "markdown_inline" or lang == "text" then
 					return true
 				end
