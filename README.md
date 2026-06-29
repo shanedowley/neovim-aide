@@ -476,12 +476,12 @@ You have now successfully executed your first AI-assisted workflow.
 
 ## Contributing
 
-- `codex/docs/CONTRIBUTING.md` —
+- `docs/CONTRIBUTING.md` — contribution guidelines
 
 ## Release Documentation
 
 - `docs/releases/RELEASE_NOTES_RC1_0.md` — historical Release Candidate 1.0 notes
-- `docs/releases/RELEASE_NOTES_R1_1_FULL.md` — historical Release 1.1 notes
+- `docs/releases/RELEASE_NOTES_R1_1.md` — historical Release 1.1 notes
 - `docs/releases/R1_2_BACKLOG.md` — release scope and backlog tracking
 
 ## Repository Documentation

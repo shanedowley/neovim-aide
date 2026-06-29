@@ -1,4 +1,4 @@
-# CONTRIBUTING.md
+# Contributing
 
 # Contributing to Neovim-Codex
 
@@ -115,7 +115,7 @@ Significant behavioural or architectural changes should include documentation up
 Relevant documentation may include:
 
 - `README.md`
-- `docs/releases/RELEASE_NOTES_R1_1_FULL.md`
+- `docs/releases/RELEASE_NOTES_R1_1.md`
 - `RELEASE_SCOPE.md`
 - `docs/ARCHITECTURE.md`
 - `OPERATIONS.md`

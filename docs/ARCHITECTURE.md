@@ -1,4 +1,4 @@
-# ARCHITECTURE.md
+# Architecture
 
 # Neovim-Codex Release 1.1 — System Architecture
 
