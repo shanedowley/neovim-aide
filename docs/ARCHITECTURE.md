@@ -422,7 +422,7 @@ are treated as operational hygiene violations.
 Primary script:
 
 ```text
-bootstrap-nvim-codex-r1_1.sh
+bootstrap.sh
 ```
 
 Responsibilities:
