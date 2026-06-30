@@ -1,626 +1,408 @@
 # Architecture
 
-# Neovim-Codex Release 1.1 — System Architecture
+# Neovim-AIDE Architecture
 
-Neovim-Codex is an AI-Assisted Engineering System (AIES) for Neovim.
+Neovim-AIDE is an AI-Assisted Software Engineering Environment for Neovim.
 
-The system is designed around:
+This document describes the architecture of the shipped system, the responsibilities of its major runtime subsystems, and the engineering principles that guide their design.
 
-- correctness
-- control
-- traceability
-- recoverability
-- reproducibility
-
-This document describes the operational architecture and core engineering model of the system.
+The architecture is intentionally conservative. Rather than maximising automation, it emphasises correctness, explicit control and operational visibility.
 
 ---
 
-# Design Philosophy
+# Architectural Principles
 
-Neovim-Codex is intentionally designed to behave more like:
+The design of Neovim-AIDE is guided by a small number of engineering principles.
 
-- an engineering system
+## Correctness
 
-than:
+Safe engineering outcomes take precedence over automation.
 
-- a generic AI editor plugin
+## Control
 
-The project prioritizes:
+Developers remain responsible for engineering decisions. AI assists the workflow but does not replace human judgement.
 
-- observable execution
-- explicit user control
-- deterministic workflows
-- operational safety
-- recoverable failure modes
+## Traceability
 
-The architecture assumes:
+Workflow execution should be be observable, understandable and diagnosable.
 
-- AI systems can fail
-- environments can degrade
-- generated code must be inspectable
-- human users remain in control
+## Operational Visibility
+
+The system should make its current state, progress and failures visible rather than hiding them behind background automation.
+
+## Human-controlled. AI-assisted.
+
+AI is treated as an engineering tool operating within explicit workflows rather than an autonomous agent.
 
 ---
 
-# Core Operational Pipeline
+# Architectural Overview
 
-High-level execution flow:
+Neovim-AIDE consists of a set of cooperating runtime subsystems.
+
+Each subsystem has a clearly defined responsibility.
 
 ```text
-User Action
-    ↓
-Prompt Construction
-    ↓
-Runner Preflight
-    ↓
-Health Validation
-    ↓
-Codex CLI Execution
-    ↓
-Response Capture
-    ↓
-Diff Preview
-    ↓
-Validation
-    ↓
-Explicit Confirmation
-    ↓
-Apply
-    ↓
-Operational Logging
+                  User
+                    │
+          Commands / Keymaps
+                    │
+             Workflow Layer
+                    │
+         Prompt Construction
+                    │
+        Runner & Preflight Checks
+                    │
+      Runtime Health Validation
+                    │
+          AI Model Execution
+                    │
+     Report & Preview Generation
+                    │
+ Validation & Explicit Confirmation
+                    │
+            Apply Changes
+                    │
+ Logging • Runtime State • Metrics
 ```
 
-This flow is intentionally layered.
+The architecture intentionally provides a single, predictable workflow regardless of the AI-assisted operation being performed.
+
+---
+
+# Runtime Workflow
+
+Every AI-assisted workflow follows the same execution lifecycle.
+
+```text
+User Request
+      ↓
+Construct Prompt
+      ↓
+Runner Preflight
+      ↓
+Runtime Health Check
+      ↓
+Execute AI Request
+      ↓
+Generate Report
+      ↓
+Preview Changes
+      ↓
+Validate
+      ↓
+Explicit Confirmation
+      ↓
+Apply Changes
+```
+
+This common lifecycle keeps behaviour predictable, simplifies debugging and makes operational state easy to understand.
+
+---
+
+# Core Runtime Subsystems
+
+Neovim-AIDE is organised as a collection of focused runtime subsystems.
+
+Each subsystem has a single primary responsibility and communicates with neighbouring subsystems through well-defined workflow boundaries.
+
+This separation keeps the architecture understandable, maintainable and testable.
+
+---
+
+## Workflow
+
+The workflow subsystem provides the user-facing entry point into Neovim-AIDE.
+
+It is responsible for initiating AI-assisted operations and coordinating the overall execution lifecycle.
+
+Responsibilities include:
+
+- user commands
+- key mappings
+- workflow orchestration
+- lifecycle coordination
+
+---
+
+## Prompt Construction
+
+Prompt construction transforms user intent into structured prompts suitable for AI execution.
+
+Responsibilities include:
+
+- prompt templates
+- instruction construction
+- source context
+- language context
+- prompt versioning
+
+---
+
+## Runner
+
+The runner is the central orchestration component.
+
+It coordinates execution from preflight validation through completion and ensures that workflow stages execute in the correct order.
+
+Responsibilities include:
+
+- workflow orchestration
+- execution scheduling
+- preflight validation
+- execution coordination
+- failure handling
+
+---
+
+## Runtime Health
+
+The runtime health subsystem determines whether AI workflows can execute safely.
+
+Neovim-AIDE uses a **Stale-While-Revalidate** health model.
+
+At startup, the most recently known health state is loaded from persistent cache, allowing Neovim to become immediately usable without blocking startup.
+
+Whenever an AI workflow is invoked, a complete runtime health check is performed before execution proceeds.
+
+Responsibilities include:
+
+- dependency validation
+- environment verification
+- persistent health cache
+- execution gating
+- health reporting
+
+This approach combines fast startup with mandatory runtime validation.
+
+---
+
+## Runtime State
+
+Runtime state provides visibility into both environment readiness and workflow execution.
+
+Two complementary state models are maintained.
+
+### Health State
+
+Health state describes whether the environment is capable of safely executing AI-assisted workflows.
+
+Typical states include:
+
+- Unknown
+- Health Check Running
+- Ready
+- Blocked
+
+### Operational State
+
+Operational state reflects the current workflow lifecycle.
+
+Typical states include:
+
+- Running
+- Preview
+- Validating
+- Applied
+- Failed
+
+Operational state always takes precedence while a workflow is active, ensuring the user sees the most relevant information.
+
+---
+
+## AI Execution
+
+The AI execution subsystem delegates model interaction to the configured AI provider.
+
+The remainder of the system is insulated from provider-specific implementation details, allowing execution behaviour to evolve independently from workflow orchestration.
+
+Responsibilities include:
+
+- process execution
+- asynchronous communication
+- response collection
+- execution abstraction
+
+---
+
+## Report Windows
+
+Report windows provide consistent operational feedback throughout workflow execution.
+
+Rather than exposing raw command output, Neovim-AIDE presents structured reports that explain the current operation, its outcome and any required user action.
+
+Examples include:
+
+- health reports
+- validation reports
+- execution summaries
+- diagnostics
+
+This provides a consistent user experience across all workflows.
+
+---
+
+## Preview
+
+The preview subsystem presents generated changes before they are applied.
+
+Responsibilities include:
+
+- unified diff generation
+- review interface
+- confirmation workflow
 
 No silent apply path exists.
 
 ---
 
-# System Layers
+## Validation
 
-## 1. User Layer
+Validation provides confidence that generated changes are suitable for application.
 
-The user initiates workflows via:
+Depending on the workflow, validation may include:
 
-- keybindings
-- visual selections
-- commands
-- scratchpad prompts
+- syntax validation
+- constrained refactoring
+- language-aware analysis
 
-Examples:
-
-- `<leader>cE`
-- `<leader>ce`
-- `<leader>cR`
-- `:CodexHealth`
+Validation exists to reduce incorrect or unsafe modifications before they reach the user's project.
 
 ---
 
-## 2. Prompt Layer
+## Apply
 
-Prompt construction normalizes:
+The apply subsystem performs controlled modification of project files.
 
-- instructions
-- filetype context
-- embedded code
-- fenced language blocks
+Changes are applied only after successful completion of the workflow lifecycle and explicit user confirmation.
 
-Primary responsibilities:
-
-- prompt shaping
-- context preparation
-- embedded execution formatting
-
-Key modules:
-
-- `codex_prompt.lua`
-- `prompt_store.lua`
-- `prompt_version.lua`
+The architecture intentionally avoids autonomous source-code modification.
 
 ---
 
-## 3. Runner Layer
+## Observability
 
-The runner is the operational orchestration layer.
+Operational observability is treated as part of the system architecture rather than an implementation detail.
 
-Primary responsibilities:
+Responsibilities include:
 
-- preflight validation
-- health gate enforcement
-- Codex CLI execution
-- response capture
-- failure handling
-- operational logging
+- structured logging
+- latency instrumentation
+- workflow tracing
+- diagnostics
+- operational metrics
 
-Key module:
-
-```text
-lua/codex/runner.lua
-```
-
-The runner is intentionally:
-
-- state-aware
-- failure-aware
-- operationally observable
+These capabilities support debugging, troubleshooting and performance analysis.
 
 ---
 
-# Runner Preflight Model
+## Bootstrap
 
-Before execution begins, the runner validates operational readiness.
+Bootstrap prepares a new environment for reliable operation.
 
-Examples:
+Responsibilities include:
 
-- health status
-- environment correctness
-- prompt integrity
+- dependency verification
+- installation validation
+- runtime directory validation
+- configuration checks
 
-Blocked execution paths:
+Development follows a **sandbox-first validation** philosophy.
 
-- degraded health
-- failed validation
-- missing prompt state
-
-Example:
-
-```text
-healthcheck_not_pass
-```
-
-This prevents AI execution in degraded environments.
+Changes are validated in isolated environments before they are merged or released, helping ensure reproducible installations and reducing regression risk.
 
 ---
 
-# Health System
+# Runtime Model
 
-Primary module:
+Neovim-AIDE separates configuration, runtime state, cache and operational data in accordance with the XDG Base Directory Specification.
 
-```text
-lua/codex/health.lua
-```
+This separation improves:
 
-Responsibilities:
+- maintainability
+- reproducibility
+- troubleshooting
+- operational hygiene
 
-- dependency validation
-- environment inspection
-- operational readiness
-- bootstrap integrity
-
-Interfaces:
-
-- `:CodexHealth`
-- bootstrap validation
-- runner preflight checks
+Runtime-generated artefacts are intentionally kept outside the configuration directory.
 
 ---
 
-# Stale-While-Revalidate Architecture
+# Repository Structure
 
-Release 1.1 introduces a Stale-While-Revalidate health model.
-
-Historically, startup health validation occurred before the system was considered ready for use.
-
-While operationally safe, this introduced startup latency and reduced perceived responsiveness.
-
-Release 1.1 separates startup responsiveness from runtime validation.
-
-Startup now uses the most recently known health state while deferring real validation until a Codex workflow is executed.
-
-The resulting flow is:
-
-```text
-Neovim Startup
-    ↓
-Read Cached Health State
-    ↓
-Display Health Status
-    ↓
-Immediate User Interaction
-    ↓
-Codex Workflow Invoked
-    ↓
-Real Health Validation
-    ↓
-Allow or Block Execution
-```
-
-This architecture preserves execution safety while removing health validation from the startup path.
-
-Key properties:
-
-- startup remains immediately usable
-- no blocking startup healthcheck occurs
-- execution validation remains mandatory
-- degraded systems remain blocked at point-of-use
-
-The health model therefore improves responsiveness without weakening correctness guarantees.
-
----
-
-# Codex CLI Integration
-
-Neovim-Codex delegates model execution to Codex CLI.
-
-Primary module:
-
-```text
-lua/codex/cli.lua
-```
-
-Responsibilities:
-
-- argv construction
-- model selection
-- execution contract
-- CLI process orchestration
-
-Execution occurs through:
-
-- Neovim jobs
-- buffered stdout/stderr capture
-- asynchronous scheduling
-
----
-
-# Preview System
-
-The preview system is intentionally central to the architecture.
-
-Generated changes are previewed before apply.
-
-Primary responsibilities:
-
-- unified diff rendering
-- user inspection
-- explicit confirmation workflow
-
-Primary module:
-
-```text
-lua/codex/preview.lua
-```
-
-Key principle:
-
-```text
-preview first, apply second
-```
-
-No silent mutation path exists.
-
----
-
-# Validation Layer
-
-Generated changes should validate before apply.
-
-Examples:
-
-- clang syntax validation
-- constrained rewrite guards
-- Treesitter-scoped refactor constraints
-
-Primary modules:
-
-- `clang.lua`
-- `treesitter.lua`
-
-This layer exists to reduce:
-
-- malformed edits
-- invalid syntax
-- unsafe broad rewrites
-
----
-
-# Apply Layer
-
-Apply operations occur only after:
-
-- preview
-- validation
-- explicit user confirmation
-
-The system intentionally avoids:
-
-- autonomous mutation
-- hidden auto-apply behavior
-
----
-
-# Logging & Telemetry
-
-Operational logging is treated as a first-class system concern.
-
-Primary module:
-
-```text
-lua/codex_log.lua
-```
-
-Examples of logged events:
-
-- start
-- response
-- latency
-- fail
-- validation
-- apply
-- preflight block
-
-Logs are intended to support:
-
-- observability
-- debugging
-- replayability
-- operational transparency
-
-Default log location:
-
-```text
-~/.local/state/nvim/codex.log
-```
-
----# Recovery System
-
-Failures are treated as operational events.
-
-Primary responsibilities:
-
-- capture failure state
-- preserve diagnostics
-- support inspection and recovery
-
-Primary module:
-
-```text
-lua/codex_recovery.lua
-```
-
-Examples:
-
-- health gate blocks
-- validation failures
-- execution failures
-
----
-
-# Runtime Separation Model
-
-Neovim-Codex intentionally separates:
-
-- configuration
-- runtime state
-- cache
-- operational logs
-
-Expected XDG layout:
-
-```text
-~/.config/nvim
-~/.local/share/nvim
-~/.local/state/nvim
-~/.cache/nvim
-```
-
-The bootstrap system validates this separation.
-
-Runtime artefacts inside:
-
-```text
-~/.config/nvim
-```
-
-are treated as operational hygiene violations.
-
----
-
-# Bootstrap Architecture
-
-Primary script:
+The repository broadly mirrors the architectural organisation of the runtime.
 
 ```text
 bootstrap.sh
+
+lua/
+    aide/
+        workflow.lua
+        runner.lua
+        health.lua
+        state.lua
+        preview.lua
+        prompt.lua
+        validation.lua
+        report.lua
+        cli.lua
+        log.lua
+
+docs/
+tests/
+demo/
 ```
 
-Responsibilities:
+Each major runtime subsystem is implemented as a focused module with a single primary responsibility.
 
-- dependency checks
-- config validation
-- runtime separation enforcement
-- lazy.nvim bootstrap
-- operational health validation
-- health gate integrity testing
-
-Supported modes:
-
-- `--check`
-- `--sync`
-- `--test-health-gate`
+This alignment between architecture and implementation helps contributors navigate the codebase while reducing architectural drift over time.
 
 ---
 
 # Safety Model
 
-Neovim-Codex intentionally optimizes for:
-
-- controlled execution
-- observable workflows
-- deterministic behavior
+Neovim-AIDE is intentionally designed to favour explicit engineering workflows over autonomous behaviour.
 
 Safety mechanisms include:
 
+- runtime health validation
 - preview-before-apply
 - validation-before-apply
-- health gates
-- constrained refactor scopes
-- operational logging
-- explicit confirmation
+- explicit user confirmation
+- structured operational logging
+- observable workflow state
 
 The architecture assumes:
 
-- generated code can be incorrect
-- AI systems require supervision
-- user control must remain primary
-
----
-
-# State Model
-
-Operational state transitions are explicit.
-
-Health states:
-
-- unknown
-- healthcheck running
-- ready
-- blocked
-
-Operational states:
-
-- running
-- preview
-- validating
-- applied
-- failed
-
-Operational states always take precedence over health states.
-
-This improves:
-
-- observability
-- UX clarity
-- operational debugging
-
-Primary module:
-
-```text
-lua/codex/state.lua
-```
-
----
-
-# Treesitter Integration
-
-Treesitter is used for:
-
-- scoped refactor extraction
-- syntax-aware operations
-- constrained transformation workflows
-
-This reduces:
-
-- broad unsafe rewrites
-- accidental file-wide mutation
-
-Primary module:
-
-```text
-lua/codex/treesitter.lua
-```
-
----
-
-# Current Release 1.1 Scope
-
-Primary focus:
-
-- macOS
-- C/C++
-- safe AI-assisted refactoring workflows
-- operational observability
-- workflow visibility
-
-Secondary support:
-
-- JavaScript debugging
-- general embedded prompt workflows
-
-Linux support remains experimental.
-
-Windows is currently unsupported.
-
----
-
-# Repository Boundary
-
-Neovim-Codex Release 1.1 ships as a curated engineering environment.
-
-The repository contains:
-
-- the core Neovim-Codex AIES subsystem
-- supporting Neovim IDE infrastructure
-- operational tooling
-- demo assets
-- workflow documentation
-
-The operational support boundary primarily applies to:
-
-- Codex workflows
-- validation systems
-- observability systems
-- recovery systems
-- C/C++ engineering workflows
-
-Supporting Neovim UX components may evolve independently from the core AIES subsystem.
+- AI-generated code can be incorrect.
+- Development environments can degrade.
+- Human review remains essential.
 
 ---
 
 # Architectural Non-Goals
 
-Neovim-Codex is NOT attempting to become:
+Neovim-AIDE is intentionally **not** designed to become:
 
-- autonomous coding agent
-- background AI mutator
-- invisible automation system
-- zero-review apply workflow
+- an autonomous coding agent
+- an invisible background automation system
+- a zero-review code generator
+- a fully automatic source-code mutator
 
-The system intentionally preserves:
-
-- user review
-- operational visibility
-- explicit control
-
----
-
-# Long-Term Direction
-
-Future architectural areas include:
-
-- multi-language support
-- OpenRouter abstraction
-- telemetry standardization
-- advanced recovery tooling
-- workflow state indicators
-- session memory
-- cloud-hosted orchestration
-- prompt externalization
-- platform abstraction layer
+The architecture deliberately favours explicit interaction over hidden automation.
 
 ---
 
 # Summary
 
-Neovim-Codex Release 1.1 is designed as:
+Neovim-AIDE is an AI-Assisted Software Engineering Environment built around structured workflows, runtime validation and explicit developer control.
 
-```text
-AI-Assisted Engineering System
-```
+Its architecture combines workflow orchestration, runtime health validation, operational visibility and user approval into a coherent engineering model.
 
-The architecture prioritizes:
+The guiding principles remain unchanged:
 
-- correctness
-- control
-- traceability
-- recoverability
-- reproducibility
+- Correctness
+- Control
+- Traceability
 
-The system is intentionally engineered around:
-
-- observable workflows
-- operational transparency
-- explicit approval
-- deterministic operational behavior
-- safe AI-assisted engineering
+**Human-controlled. AI-assisted.**
