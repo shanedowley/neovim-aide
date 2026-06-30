@@ -4,31 +4,17 @@ Welcome to the Neovim-AIDE Contributor Guide.
 
 Thank you for your interest in contributing to the project.
 
-Neovim-AIDE is an open source project built on the belief that AI should **assist** software engineers, not replace them. Every design decision is guided by the principle that engineers remain in control while AI augments their capability.
+Neovim-AIDE is an open source project built on a simple principle:
 
-Whether you are fixing a bug, improving the documentation, refining the user experience or contributing new functionality, you are helping to build a better engineering environment for the entire community.
+> **Human-controlled. AI-assisted.**
 
----
+AI should assist software engineers, not replace them.
 
-# Project Identity
-
-## Neovim-AIDE
-
-### *An AI-Assisted Software Engineering Environment for Neovim.*
-
-**Human-controlled. AI-assisted.**
-
-Built for:
-
-- **Correctness**
-- **Control**
-- **Traceability**
-
-These values guide both the product itself and the way the project is engineered.
+Whether you are fixing a bug, improving the documentation, refining the user experience or contributing new functionality, you are helping to build a better software engineering environment for the entire community.
 
 ---
 
-# Project Principles
+# Engineering Principles
 
 Neovim-AIDE is built around a small number of long-term engineering principles.
 
@@ -44,11 +30,19 @@ Neovim-AIDE deliberately avoids hidden automation in favour of explicit operatio
 
 ---
 
+## Correctness Before Convenience
+
+Safe engineering outcomes take precedence over automation.
+
+Reliability, predictability and confidence are valued more highly than feature velocity.
+
+---
+
 ## Explicit Over Implicit
 
 Operations should be intentional and visible.
 
-Users should understand what the system is doing and when it is doing it.
+Users should understand what the system is doing, when it is doing it and why.
 
 ---
 
@@ -56,21 +50,13 @@ Users should understand what the system is doing and when it is doing it.
 
 Reliable software is observable software.
 
-Health, workflow state, recovery information, logging and validation exist to make the behaviour of the system visible rather than hidden.
-
----
-
-## Deterministic Behaviour
-
-The same operation should produce the same outcome when performed under the same conditions.
-
-Reducing uncertainty improves both engineering confidence and release quality.
+Health, workflow state, diagnostics, logging and validation exist to make system behaviour visible rather than hidden.
 
 ---
 
 ## Sandbox-First Validation
 
-All new functionality must be validated inside the isolated development sandbox before it is considered complete.
+All new functionality should be validated inside the isolated development sandbox before it is considered complete.
 
 A contributor's personal Neovim configuration is a development environment.
 
@@ -86,38 +72,61 @@ The project values reproducible workflows over environment-specific behaviour.
 
 ---
 
-# Contributor Workflow
+# Engineering Workflow
 
 Every contribution should follow the same engineering workflow.
 
 ```text
-Understand
-    │
-    ▼
+Observe
+    ↓
+Analyse
+    ↓
 Design
-    │
-    ▼
+    ↓
 Implement
-    │
-    ▼
-Local Smoke Test
-    │
-    ▼
+    ↓
+Validate
+    ↓
 Commit
-    │
-    ▼
+    ↓
 Sandbox Validation
-    │
-    ▼
-Regression Testing
-    │
-    ▼
+    ↓
 Review
 ```
 
 Small, independently testable changes are preferred over large feature branches.
 
-Whenever possible, each story should leave the project in a working, releasable state.
+Whenever practical, each story should leave the project in a working, releasable state.
+
+Engineering confidence is built through incremental progress and continuous validation.
+
+---
+
+# Repository Workflow
+
+Contributions typically follow this lifecycle.
+
+```text
+Issue / Idea
+      ↓
+Understand the Problem
+      ↓
+Design the Change
+      ↓
+Implement
+      ↓
+Validate Locally
+      ↓
+Validate in Sandbox
+      ↓
+Commit
+      ↓
+Review
+      ↓
+Merge
+```
+
+Keeping each contribution focused makes review easier and reduces the risk of regressions.
 
 ---
 
@@ -127,13 +136,11 @@ Additional contributor documentation is organised into focused guides.
 
 | Guide | Purpose |
 |-------|---------|
-| `SANDBOX.md` | Isolated development and release validation |
-| *(Future)* Testing | Regression testing strategy |
-| *(Future)* Release | Release workflow and checklists |
-| *(Future)* Architecture | High-level project architecture |
-| *(Future)* Coding Standards | Engineering conventions and project style |
+| `SANDBOX.md` | Sandbox setup, validation workflow and release verification. |
 
-Each document has a single responsibility and links to related material where appropriate.
+As the project grows, additional contributor guides may be added.
+
+Each guide should have a single, well-defined responsibility and avoid duplicating information maintained elsewhere.
 
 ---
 
@@ -141,29 +148,28 @@ Each document has a single responsibility and links to related material where ap
 
 If you are contributing to Neovim-AIDE for the first time, the recommended reading order is:
 
-1. This guide.
-2. `SANDBOX.md`
-3. Explore the project.
-4. Choose a small story or improvement.
-5. Validate your work in the sandbox.
-6. Submit your contribution.
+1. Read this guide.
+2. Read `SANDBOX.md`.
+3. Explore the repository.
+4. Choose a small improvement or issue.
+5. Validate your changes locally.
+6. Validate your changes in the sandbox.
+7. Submit your contribution.
 
 ---
 
 # Contributing
 
-Contributions of all kinds are welcome.
+Contributions of all kinds are welcome, including:
 
-Examples include:
-
-- Feature development
-- Bug fixes
-- Documentation improvements
-- User experience enhancements
-- Testing and validation
-- Performance improvements
-- Engineering discussions
-- Project ideas
+- bug fixes
+- documentation improvements
+- workflow enhancements
+- user experience improvements
+- testing and validation
+- performance improvements
+- engineering discussions
+- ideas for future development
 
 Thoughtful discussion, careful engineering and incremental improvement are valued more highly than rapid feature development.
 
@@ -173,7 +179,7 @@ Thoughtful discussion, careful engineering and incremental improvement are value
 
 Neovim-AIDE is more than a collection of plugins.
 
-It is an engineering environment built around correctness, control and traceability.
+It is a software engineering environment built around correctness, control and traceability.
 
 Every contribution helps make the project more reliable, more understandable and more valuable for the engineers who use it.
 
