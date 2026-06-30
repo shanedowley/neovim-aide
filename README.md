@@ -1,7 +1,5 @@
 # Neovim-AIDE
 
-> Engineering first. AI second.
-
 > **An AI-Assisted Software Engineering Environment for Neovim.**
 >
 > **Human-controlled. AI-assisted.**
