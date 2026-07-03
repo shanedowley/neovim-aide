@@ -4,7 +4,7 @@ Welcome to the documentation for **Neovim-AIDE**.
 
 Neovim-AIDE is an **AI-Assisted IDE based on Neovim**.
 
-This documentation is organised to help you quickly find the information you need, whether you are using Neovim-AIDE in your daily software engineering workflow or contributing to its development.
+This documentation is organised to help you quickly find the information you need, whether you are using Neovim-AIDE in your daily software development workflow or contributing to its development.
 
 ---
 

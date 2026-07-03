@@ -5,7 +5,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 
-SANDBOX_ROOT=/tmp/neovim-codex-sandbox
+SANDBOX_ROOT=/tmp/neovim-aide-sandbox
 
 CONFIG_DIR="$SANDBOX_ROOT/config"
 DATA_DIR="$SANDBOX_ROOT/data"

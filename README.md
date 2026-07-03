@@ -50,7 +50,7 @@ The goal is trustworthy AI-assisted software development.
 Clone the repository into your Neovim configuration directory:
 
 ```bash
-git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
 cd ~/.config/nvim
 ```
 
@@ -394,7 +394,7 @@ Windows support is planned as part of a future cross-platform strategy.
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
 cd ~/.config/nvim
 ```
 

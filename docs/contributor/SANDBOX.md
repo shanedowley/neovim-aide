@@ -33,7 +33,7 @@ Every release candidate should be validated from a clean sandbox installation be
 The sandbox is created under:
 
 ```text
-/tmp/neovim-codex-sandbox
+/tmp/neovim-aide-sandbox
 ```
 
 > **Note:** If the sandbox location changes in the future, this document should be updated to match the implementation.
@@ -183,12 +183,12 @@ After creating the sandbox, the required XDG environment variables are displayed
 Example:
 
 ```bash
-export XDG_CONFIG_HOME=/tmp/neovim-codex-sandbox/config
-export XDG_DATA_HOME=/tmp/neovim-codex-sandbox/data
-export XDG_STATE_HOME=/tmp/neovim-codex-sandbox/state
-export XDG_CACHE_HOME=/tmp/neovim-codex-sandbox/cache
+export XDG_CONFIG_HOME=/tmp/neovim-aide-sandbox/config
+export XDG_DATA_HOME=/tmp/neovim-aide-sandbox/data
+export XDG_STATE_HOME=/tmp/neovim-aide-sandbox/state
+export XDG_CACHE_HOME=/tmp/neovim-aide-sandbox/cache
 
-cd /tmp/neovim-codex-sandbox/config/nvim
+cd /tmp/neovim-aide-sandbox/config/nvim
 
 nvim
 ```
@@ -202,7 +202,7 @@ Verify that Neovim is using the sandbox configuration:
 Expected output:
 
 ```text
-/tmp/neovim-codex-sandbox/config/nvim
+/tmp/neovim-aide-sandbox/config/nvim
 ```
 
 ---
@@ -214,12 +214,12 @@ A typical validation session looks like:
 ```bash
 tools/sandbox.sh up
 
-export XDG_CONFIG_HOME=/tmp/neovim-codex-sandbox/config
-export XDG_DATA_HOME=/tmp/neovim-codex-sandbox/data
-export XDG_STATE_HOME=/tmp/neovim-codex-sandbox/state
-export XDG_CACHE_HOME=/tmp/neovim-codex-sandbox/cache
+export XDG_CONFIG_HOME=/tmp/neovim-aide-sandbox/config
+export XDG_DATA_HOME=/tmp/neovim-aide-sandbox/data
+export XDG_STATE_HOME=/tmp/neovim-aide-sandbox/state
+export XDG_CACHE_HOME=/tmp/neovim-aide-sandbox/cache
 
-cd /tmp/neovim-codex-sandbox/config/nvim
+cd /tmp/neovim-aide-sandbox/config/nvim
 
 nvim
 ```

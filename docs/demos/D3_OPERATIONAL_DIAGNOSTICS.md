@@ -157,4 +157,4 @@ The system is intentionally designed to expose:
 - workflow transitions
 - recovery information
 
-This operational visibility is part of the core design philosophy of the Neovim-AIDE AI-Assisted Software Engineering Environment.
+This operational visibility is part of the core design philosophy of the Neovim-AIDE AI-Assisted IDE.

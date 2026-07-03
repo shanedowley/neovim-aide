@@ -58,7 +58,7 @@ Without Codex CLI, Neovim-AIDE remains fully usable as a Neovim configuration, b
 Clone Neovim-AIDE into your Neovim configuration directory.
 
 ```bash
-git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
 ```
 
 ---
