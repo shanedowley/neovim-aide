@@ -39,6 +39,24 @@ function M.notify(msg, level, opts)
 	return ui_notify.notify(msg, level, opts)
 end
 
+function M.status(msg)
+	return ui_notify.notify(msg, vim.log.levels.INFO, {
+		timeout = false,
+	})
+end
+
+function M.stop_status(notif_id, msg, level)
+	if notif_id then
+		return ui_notify.update(notif_id, msg, level or vim.log.levels.INFO, {
+			timeout = 1500,
+		})
+	end
+
+	return ui_notify.notify(msg, level or vim.log.levels.INFO, {
+		timeout = 1500,
+	})
+end
+
 function M.start(msg)
 	if spinner.timer then
 		pcall(spinner.timer.stop, spinner.timer)
