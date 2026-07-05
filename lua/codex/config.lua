@@ -16,6 +16,10 @@ local config = {
 		min_cli_version = "0.120.0",
 		model_probe_enabled = true,
 	},
+
+	workflow = {
+		default_mode = "fast",
+	},
 }
 
 function M.get()

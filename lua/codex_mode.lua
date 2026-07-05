@@ -1,9 +1,9 @@
 -- ~/.config/nvim/lua/codex_mode.lua
 local M = {}
 
-local state = {
-	current = "fast",
-}
+-- Emergency fallback used only if the configuration cannot be read
+-- or contains an invalid workflow mode.
+local FALLBACK_MODE = "fast"
 
 local profiles = {
 	strict = {
@@ -50,6 +50,27 @@ local profiles = {
 		explain_suffix = "\n\nFAST MODE:\n- Keep output minimal.\n- Skip redundant explanation.\n",
 		rewrite_suffix = "\n\nFAST MODE:\n- Minimal formatting changes.\n",
 	},
+}
+
+local function configured_default_mode()
+	local ok, config = pcall(require, "codex.config")
+	if not ok or not config or type(config.get) ~= "function" then
+		return FALLBACK_MODE
+	end
+
+	local cfg = config.get()
+	local workflow = cfg.workflow or {}
+	local mode = workflow.default_mode
+
+	if type(mode) == "string" and profiles[mode] then
+		return mode
+	end
+
+	return FALLBACK_MODE
+end
+
+local state = {
+	current = configured_default_mode(),
 }
 
 function M.get()
