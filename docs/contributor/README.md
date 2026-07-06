@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Neovim-AIDE Contributor Guide
 
 Welcome to the Neovim-AIDE Contributor Guide.
@@ -184,4 +195,3 @@ It is a software development IDE built around correctness, control and traceabil
 Every contribution helps make the project more reliable, more understandable and more valuable for the engineers who use it.
 
 Thank you for helping build Neovim-AIDE.
-

@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Our Software Development Philosophy
 
 ## Purpose
@@ -282,3 +293,4 @@ However, the central principle is expected to remain constant:
 Our objective is not to build the largest AI-assisted development environment.
 
 Our objective is to build one of the most trustworthy.
+

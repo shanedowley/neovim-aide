@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Installation
 
 # Installing Neovim-AIDE
@@ -299,4 +310,3 @@ The bootstrap process will ensure that required plugins are installed.
 Neovim-AIDE is designed to provide a reproducible, observable and maintainable AI-assisted software development environment.
 
 Following the installation and bootstrap process described in this guide establishes a clean, validated foundation for AI-assisted software development while preserving the project's guiding principles of correctness, control and traceability.
-

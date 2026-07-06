@@ -1,7 +1,13 @@
 # Neovim-AIDE
 
-> **A Neovim IDE**
-> _Human controlled. AI assisted._
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
 
 ## Ethos
 

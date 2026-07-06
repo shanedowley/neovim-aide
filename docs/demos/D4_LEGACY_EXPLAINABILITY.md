@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # D4 — Legacy Code Explainability Demo
 
 ## Purpose

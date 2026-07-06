@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Neovim-AIDE Documentation
 
 Welcome to the documentation for **Neovim-AIDE**.
@@ -106,4 +117,3 @@ If you cannot find the information you are looking for:
 - open a discussion or issue on GitHub if you believe documentation is missing or unclear
 
 Improving documentation is always a welcome contribution.
-

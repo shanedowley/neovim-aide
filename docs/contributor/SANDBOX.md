@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Neovim-AIDE Development Sandbox
 
 ## Purpose
@@ -288,4 +299,3 @@ By separating development from release validation, contributors can test Neovim-
 Every validated release increases confidence that Neovim-AIDE will behave consistently across contributor machines and end-user installations alike.
 
 Sandbox-First Validation is therefore not simply a testing technique—it is one of the core engineering principles of the Neovim-AIDE project.
-

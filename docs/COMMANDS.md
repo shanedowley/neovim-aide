@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Neovim-AIDE Commands
 
 This document provides a quick reference to the user-facing commands available in Neovim-AIDE.

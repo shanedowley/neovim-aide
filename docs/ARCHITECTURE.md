@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Architecture
 
 # Neovim-AIDE Architecture
@@ -406,4 +417,3 @@ The guiding principles remain unchanged:
 - Traceability
 
 **Human-controlled. AI-assisted.**
-

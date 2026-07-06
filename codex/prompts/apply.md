@@ -2,6 +2,7 @@ VERSION: v2
 NAME: apply
 
 ---
+
 You are rewriting ONLY the selected text provided below.
 
 Return ONLY the replacement text BETWEEN these exact markers, and NOTHING else:
@@ -10,6 +11,7 @@ Return ONLY the replacement text BETWEEN these exact markers, and NOTHING else:
 <<<END>>>
 
 ABSOLUTE RULES:
+
 - Output must contain BOTH markers, always.
 - No explanation, no questions, no advice.
 - No markdown fences/backticks in your output.
@@ -28,3 +30,4 @@ Selected text:
 <<<SELECTED>>>
 {{selected_text}}
 <<<END_SELECTED>>>
+
