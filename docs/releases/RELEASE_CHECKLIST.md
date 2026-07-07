@@ -1,5 +1,14 @@
 # Neovim-AIDE Release Checklist
 
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 This checklist defines the minimum engineering standard required before any public release of Neovim-AIDE.
 
 The objective is simple:
@@ -37,6 +46,7 @@ Verify repository health.
 - [ ] No accidental dependency updates
 - [ ] Commit history reviewed
 - [ ] Release branch up to date
+- [ ] Repository remote verified
 
 ---
 
@@ -63,6 +73,7 @@ Verify installation tooling.
 - [ ] `./scripts/bootstrap.sh --sync`
 - [ ] Health report completes successfully
 - [ ] Bootstrap output reviewed
+- [ ] Bootstrap health notifications verified
 - [ ] Bootstrap failure paths reviewed
 
 ---
@@ -88,10 +99,13 @@ Verify:
 
 Inside the sandbox:
 
-- [ ] `:CodexHealth`
-- [ ] `:CodexState`
-- [ ] Statusline behaviour verified
+- [ ] :CodexHealth
+- [ ] Health progress notification verified
+- [ ] :CodexState
+- [ ] Statusline health state verified
+- [ ] Statusline workflow mode verified
 - [ ] Health cache behaviour verified
+- [ ] Workflow mode switching verified
 
 ---
 
@@ -100,14 +114,14 @@ Inside the sandbox:
 Validate representative AI-assissted development workflows.
 
 - [ ] Explain
+- [ ] Rewrite
 - [ ] Refactor
 - [ ] Safe Preview
 - [ ] Apply
 - [ ] Failure Recovery
-- [ ] Latency reporting
+- [ ] Clang validation
 - [ ] Guardrails
-- [ ] Context injection
-- [ ] Repeat Last Operation
+- [ ] Latency reporting
 
 ---
 
@@ -119,6 +133,8 @@ Confirm that recently completed stories continue to behave correctly.
 - [ ] Sandbox
 - [ ] Health model
 - [ ] Workflow state
+- [ ] Workflow configuration
+- [ ] Product identity
 - [ ] Documentation
 - [ ] Recovery reports
 
@@ -128,14 +144,19 @@ Confirm that recently completed stories continue to behave correctly.
 
 Review the release from the perspective of a first-time user.
 
+Would I understand:
+
+- what this product is?
+- why it exists?
+- how it differs from AI coding assistants?
+
 Ask:
 
-- Would I understand what this product is?
 - Would installation be straightforward?
 - Would I trust this system?
 - Would I understand failures?
 - Would I understand recovery?
-- Would I recommend this release to another engineer?
+- Would I recommend this release to another developer?
 
 ---
 
@@ -161,8 +182,12 @@ A Neovim-AIDE release is complete when:
 - the documentation is accurate;
 - the release is reproducible;
 - contributors can reproduce the same outcome;
-- engineers can trust the result.
+- developers can trust the result.
+
+The AI assists.
+
+The developer decides.
 
 Shipping software is not the goal.
-Shipping trustworthy IDE software is.
 
+Shipping trustworthy AI-assisted software development tooling is.
