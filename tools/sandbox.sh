@@ -13,6 +13,23 @@ STATE_DIR="$SANDBOX_ROOT/state"
 CACHE_DIR="$SANDBOX_ROOT/cache"
 SANDBOX_REPO="$CONFIG_DIR/nvim"
 
+print_enter_sandbox() {
+    echo "Enter sandbox environment:"
+    echo "  export XDG_CONFIG_HOME=$CONFIG_DIR"
+    echo "  export XDG_DATA_HOME=$DATA_DIR"
+    echo "  export XDG_STATE_HOME=$STATE_DIR"
+    echo "  export XDG_CACHE_HOME=$CACHE_DIR"
+    echo "  cd $SANDBOX_REPO"
+}
+
+print_leave_sandbox() {
+    echo "Leave sandbox environment:"
+    echo "  unset XDG_CONFIG_HOME"
+    echo "  unset XDG_DATA_HOME"
+    echo "  unset XDG_STATE_HOME"
+    echo "  unset XDG_CACHE_HOME"
+}
+
 create_sandbox() {
     echo "Creating sandbox..."
     echo
@@ -71,6 +88,8 @@ remove_sandbox() {
     if [ ! -d "$SANDBOX_ROOT" ]; then
         echo "Sandbox not present."
         echo "Nothing to do."
+        echo
+        print_leave_sandbox
         return
     fi
 
@@ -80,6 +99,8 @@ remove_sandbox() {
     rm -rf "$SANDBOX_ROOT"
 
     echo "✓ Sandbox removed."
+    echo
+    print_leave_sandbox
 }
 
 print_dir_status() {
@@ -103,6 +124,8 @@ status_sandbox() {
         echo "  ✓ Present"
     else
         echo "  ✗ Not found"
+        echo
+        print_leave_sandbox
         return
     fi
 
@@ -128,6 +151,11 @@ status_sandbox() {
     print_dir_status "data" "$DATA_DIR"
     print_dir_status "state" "$STATE_DIR"
     print_dir_status "cache" "$CACHE_DIR"
+
+    echo
+    print_enter_sandbox
+    echo
+    print_leave_sandbox
 }
 
 print_next_steps() {
@@ -140,15 +168,12 @@ print_next_steps() {
     echo "Source repository:"
     echo "  $REPO_ROOT"
     echo
-    echo "Enter sandbox environment:"
-    echo "  export XDG_CONFIG_HOME=$CONFIG_DIR"
-    echo "  export XDG_DATA_HOME=$DATA_DIR"
-    echo "  export XDG_STATE_HOME=$STATE_DIR"
-    echo "  export XDG_CACHE_HOME=$CACHE_DIR"
-    echo "  cd $SANDBOX_REPO"
+    print_enter_sandbox
     echo
     echo "Launch:"
     echo "  nvim"
+    echo
+    print_leave_sandbox
 }
 
 print_help() {

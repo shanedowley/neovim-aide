@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE
+> A Neovim IDE.
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -19,15 +19,15 @@ Neovim-AIDE is an open source IDE project built on a simple principle:
 
 > **Human-controlled. AI-assisted.**
 
-AI should assist software engineers, not replace them.
+AI should assist software developers, not replace them.
 
-Whether you are fixing a bug, improving the documentation, refining the user experience or contributing new functionality, you are helping to build a better software engineering environment for the entire community.
+Whether you are fixing a bug, improving the documentation, refining the user experience or contributing new functionality, you are helping to build a better software development environment for the entire community.
 
 ---
 
-# Engineering Principles
+# Development Principles
 
-Neovim-AIDE is built around a small number of long-term engineering principles.
+Neovim-AIDE is built around a small number of long-term development principles.
 
 These principles influence every technical decision, engineering workflow and contributor experience.
 

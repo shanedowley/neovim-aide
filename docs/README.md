@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE
+> A Neovim IDE.
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -51,6 +51,7 @@ Each document has a single primary responsibility.
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |
 | `ARCHITECTURE.md` | Explains how Neovim-AIDE is designed and how its major runtime subsystems work together.                       |
 | `CONTRIBUTING.md` | Explains how contributors are expected to develop, validate and submit changes.                                |
+| `COMMANDS.md`     | Reference for the available Neovim-AIDE commands.                                                              |
 | `contributor/`    | Additional contributor documentation covering engineering workflows, validation and project-specific guidance. |
 | `releases/`       | Historical release notes and release documentation.                                                            |
 

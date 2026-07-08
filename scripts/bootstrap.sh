@@ -17,10 +17,10 @@ BOOTSTRAP_SYNC_LOG="$NVIM_STATE_DIR/bootstrap-sync.log"
 BOOTSTRAP_HEALTH_LOG="$NVIM_STATE_DIR/bootstrap-health.log"
 
 echo "=== Neovim-AIDE Bootstrap ==="
-echo "Software Engineering Environment Check"
+echo "Software Development Environment Check"
 echo
 
-echo "This script validates:"
+echo "Validation steps:"
 echo "  - platform support"
 echo "  - required dependencies"
 echo "  - Neovim config presence"
@@ -150,7 +150,7 @@ case "$OS" in
     ;;
   Linux)
     ok "Linux detected"
-    warn "Linux support is currently experimental for R1.2"
+    warn "Linux support is currently experimental for R1.3"
     ;;
   *)
     fail "Unsupported OS: $OS"

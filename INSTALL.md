@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE
+> A Neovim IDE.
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -9,13 +9,11 @@
 
 ---
 
-# Installation
-
 # Installing Neovim-AIDE
 
-This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation. It installs and configures an entirely new and self contained IDE based on Neovim and Open AI's Codex CLI.
+This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation. It installs and configures an entirely new and self-contained IDE based on Neovim and OpenAI's Codex CLI.
 
-The objective is to provide a reproducible installation that matches the experience of a first-time user and establishes a reliable foundation for AI-assisted software development.
+The objective is to provide a reproducible installation experience for first-time users while establishing a reliable foundation for AI-assisted software development.
 
 ---
 

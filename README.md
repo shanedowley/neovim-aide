@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE
+> A Neovim IDE.
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -13,9 +13,9 @@
 
 - Neovim-AIDE is an ongoing exploration of how AI can strengthen software development practice without weakening or bypassing human judgement.
 
-- The goal is not autonomous coding. It is engineering confidence.
+- The goal is not autonomous coding. The goal is developer confidence.
 
-- Neovim-AIDE is architected as an AI-integrated IDE rather than a generic AI editor plugin, where the AI assists engineering judgement, not replaces it.
+- Neovim-AIDE is designed as an AI-assisted IDE rather than a generic AI editor plugin. The AI assists the developer’s judgement; it does not replace it.
 
 - Generated output should be reviewable.
 
@@ -25,9 +25,9 @@
 
 ## Introduction
 
-Neovim-AIDE is a Software Development IDE for Neovim built around validation, observability, explicit user control and operational safeguards.
+Neovim-AIDE is an AI-assisted software development IDE for Neovim, built around validation, observability, explicit user control and operational safeguards.
 
-Current Release: R1.2
+Current Release: R1.3
 
 Neovim-AIDE is designed for users who want AI-assisted workflows that remain:
 

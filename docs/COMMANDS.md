@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE
+> A Neovim IDE.
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -67,13 +67,15 @@ For architecture and runtime behaviour, see `docs/ARCHITECTURE.md`.
 
 ## Notification
 
-| Command                             | Purpose                                                                           |
-| ----------------------------------- | --------------------------------------------------------------------------------- |
-| `:CodexNotifyPlacement {placement}` | Configure notification placement (`top_right`, `top_center`, `bottom_left`, etc). |
-| `:CodexNotifyTest`                  | Test Codex notification rendering.                                                |
+| Command                             | Purpose                                                                       |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| `:CodexNotifyPlacement {placement}` | Configure notification placement (`top_right`, `center`, `bottom_left`, etc). |
+| `:CodexNotifyTest`                  | Test Codex notification rendering.                                            |
 
 ### Notification placement examples
 
+```vim
 :CodexNotifyPlacement top_right
-:CodexNotifyPlacement top_center
+:CodexNotifyPlacement center
 :CodexNotifyPlacement bottom_left
+```
