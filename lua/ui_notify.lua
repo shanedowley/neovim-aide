@@ -11,7 +11,7 @@ local allowed = {
 }
 
 local state = {
-	placement = "top_right",
+	placement = "center",
 	win = nil,
 	buf = nil,
 	timer = nil,
@@ -299,10 +299,15 @@ local function apply_window_style(win, level, fade_t)
 	pcall(vim.api.nvim_win_set_option, win, "wrap", false)
 	pcall(vim.api.nvim_win_set_option, win, "cursorline", false)
 
-	pcall(vim.api.nvim_win_set_option, win, "winhl", table.concat({
-		"NormalFloat:" .. float_group,
-		"FloatBorder:" .. border_group,
-	}, ","))
+	pcall(
+		vim.api.nvim_win_set_option,
+		win,
+		"winhl",
+		table.concat({
+			"NormalFloat:" .. float_group,
+			"FloatBorder:" .. border_group,
+		}, ",")
+	)
 end
 
 local function render_lines(buf, msg)
@@ -342,12 +347,16 @@ local function begin_timeout(id, timeout)
 	end
 
 	state.timer = uv.new_timer()
-	state.timer:start(timeout, 0, vim.schedule_wrap(function()
-		if state.active_id ~= id then
-			return
-		end
-		M.dismiss(id)
-	end))
+	state.timer:start(
+		timeout,
+		0,
+		vim.schedule_wrap(function()
+			if state.active_id ~= id then
+				return
+			end
+			M.dismiss(id)
+		end)
+	)
 end
 
 local function fade_and_close(id)
@@ -367,23 +376,27 @@ local function fade_and_close(id)
 	local level = state.last_level or vim.log.levels.INFO
 
 	state.fade_timer = uv.new_timer()
-	state.fade_timer:start(interval, interval, vim.schedule_wrap(function()
-		if state.active_id ~= id or not valid_win(state.win) then
-			stop_timer(state.fade_timer)
-			state.fade_timer = nil
-			return
-		end
+	state.fade_timer:start(
+		interval,
+		interval,
+		vim.schedule_wrap(function()
+			if state.active_id ~= id or not valid_win(state.win) then
+				stop_timer(state.fade_timer)
+				state.fade_timer = nil
+				return
+			end
 
-		current = current + 1
-		local t = math.min(1, current / steps)
-		apply_window_style(state.win, level, t)
+			current = current + 1
+			local t = math.min(1, current / steps)
+			apply_window_style(state.win, level, t)
 
-		if current >= steps then
-			stop_timer(state.fade_timer)
-			state.fade_timer = nil
-			close_window()
-		end
-	end))
+			if current >= steps then
+				stop_timer(state.fade_timer)
+				state.fade_timer = nil
+				close_window()
+			end
+		end)
+	)
 end
 
 function M.notify(msg, level, opts)
@@ -471,3 +484,4 @@ end
 M.setup()
 
 return M
+

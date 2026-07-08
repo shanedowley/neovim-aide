@@ -1,9 +1,12 @@
 local M = {} -- module table
 
 local codex_cli = require("codex.cli") -- Load the Codex CLI helpers used by this module
-
+local ui = require("codex.ui")
 local codex_config = require("codex.config")
 local window = require("codex.window")
+
+local HEALTH_PROGRESS_MESSAGE = "Checking model health..."
+
 M._force_fail_for_test = false
 
 M._cache = nil
@@ -621,57 +624,59 @@ local function open_report_buffer(lines)
 end
 
 function M.show()
-	local results = M.run_checks()
-	local overall = overall_status(results)
-	local counts = count_statuses(results)
+	local health_notif_id = ui.status(HEALTH_PROGRESS_MESSAGE)
 
-	local health_status
-	local health_message
-	local workflow_status
+	vim.defer_fn(function()
+		local results = M.run_checks()
+		local overall = overall_status(results)
+		local counts = count_statuses(results)
 
-	if overall == "FAIL" then
-		health_status = "blocked"
-		health_message = "✖ Codex Blocked"
-		workflow_status = "failed"
-	else
-		health_status = "ready"
-		health_message = "✓ Codex Ready"
-		workflow_status = "complete"
-	end
+		local health_status
+		local health_message
+		local workflow_status
 
-	local ok_state, health_state = pcall(require, "codex.health_state")
-	if ok_state and health_state and type(health_state.set) == "function" then
-		health_state.set(health_status, health_message)
-	end
+		if overall == "FAIL" then
+			health_status = "blocked"
+			health_message = "✖ Codex Blocked"
+			workflow_status = "failed"
+		else
+			health_status = "ready"
+			health_message = "✓ Codex Ready"
+			workflow_status = "complete"
+		end
 
-	local ok_workflow_state, workflow_state = pcall(require, "codex.state")
-	if ok_workflow_state and workflow_state and type(workflow_state.set) == "function" then
-		workflow_state.set(workflow_status, {
-			op = "healthcheck",
-			message = health_message,
-		})
-	end
+		local ok_state, health_state = pcall(require, "codex.health_state")
+		if ok_state and health_state and type(health_state.set) == "function" then
+			health_state.set(health_status, health_message)
+		end
 
-	local level = vim.log.levels.INFO
-	if overall == "DEGRADED" then
-		level = vim.log.levels.WARN
-	elseif overall == "FAIL" then
-		level = vim.log.levels.ERROR
-	end
+		local ok_workflow_state, workflow_state = pcall(require, "codex.state")
+		if ok_workflow_state and workflow_state and type(workflow_state.set) == "function" then
+			workflow_state.set(workflow_status, {
+				op = "healthcheck",
+				message = health_message,
+			})
+		end
 
-	local summary = string.format(
-		"Codex health: %s (%d pass, %d degraded, %d warn, %d fail)",
-		overall,
-		counts.PASS,
-		counts.DEGRADED,
-		counts.WARN,
-		counts.FAIL
-	)
+		local level = vim.log.levels.INFO
+		if overall == "DEGRADED" then
+			level = vim.log.levels.WARN
+		elseif overall == "FAIL" then
+			level = vim.log.levels.ERROR
+		end
 
-	vim.notify(summary, level, { title = "Codex" })
-	open_report_buffer(render_report(results))
+		local summary = string.format(
+			"Codex health: %s (%d pass, %d degraded, %d warn, %d fail)",
+			overall,
+			counts.PASS,
+			counts.DEGRADED,
+			counts.WARN,
+			counts.FAIL
+		)
 
-	return results
+		ui.stop_status(health_notif_id, summary, level)
+		open_report_buffer(render_report(results))
+	end, 50)
 end
 
 function M.check()

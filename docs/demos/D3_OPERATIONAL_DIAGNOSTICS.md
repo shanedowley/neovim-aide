@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # D3 — Operational Diagnostics Workflow Demo
 
 ## Purpose
@@ -157,4 +168,4 @@ The system is intentionally designed to expose:
 - workflow transitions
 - recovery information
 
-This operational visibility is part of the core design philosophy of the Neovim-AIDE AI-Assisted Software Engineering Environment.
+This operational visibility is part of the core design philosophy of the Neovim-AIDE AI-Assisted IDE.

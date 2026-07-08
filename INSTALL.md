@@ -1,10 +1,19 @@
-# Installation
+# Neovim-AIDE
+
+> A Neovim IDE.
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
 
 # Installing Neovim-AIDE
 
-This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation. It installs and configures an entirely new and self contained IDE based on Neovim and Open AI's Codex CLI.
+This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation. It installs and configures an entirely new and self-contained IDE based on Neovim and OpenAI's Codex CLI.
 
-The objective is to provide a reproducible installation that matches the experience of a first-time user and establishes a reliable foundation for AI-assisted software development.
+The objective is to provide a reproducible installation experience for first-time users while establishing a reliable foundation for AI-assisted software development.
 
 ---
 
@@ -58,7 +67,7 @@ Without Codex CLI, Neovim-AIDE remains fully usable as a Neovim configuration, b
 Clone Neovim-AIDE into your Neovim configuration directory.
 
 ```bash
-git clone https://github.com/shanedowley/neovim-codex.git ~/.config/nvim
+git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
 ```
 
 ---
@@ -299,4 +308,3 @@ The bootstrap process will ensure that required plugins are installed.
 Neovim-AIDE is designed to provide a reproducible, observable and maintainable AI-assisted software development environment.
 
 Following the installation and bootstrap process described in this guide establishes a clean, validated foundation for AI-assisted software development while preserving the project's guiding principles of correctness, control and traceability.
-

@@ -187,7 +187,7 @@ function M.status()
 		local hs = health_state.get() or {}
 
 		if hs.status == "running" or hs.status == "ready" or hs.status == "blocked" then
-			return hs.message
+			return string.format("%s | %s", hs.message, current_mode())
 		end
 	end
 
@@ -198,11 +198,12 @@ function M.status()
 		local cached = health_cache.read()
 
 		if cached.status == "FAIL" then
-			return "✖ Codex Blocked"
+			return string.format("✖ Codex Blocked | %s", current_mode())
 		end
 	end
 
-	return "? Codex Unknown"
+	return string.format("? Codex Unknown | %s", current_mode())
 end
 
 return M
+

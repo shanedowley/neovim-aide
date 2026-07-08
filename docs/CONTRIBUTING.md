@@ -1,3 +1,14 @@
+# Neovim-AIDE
+
+> A Neovim IDE
+> Human-controlled. AI-assisted.
+
+## AI Engine
+
+**Codex**
+
+---
+
 # Contributing
 
 # Contributing to Neovim-AIDE
@@ -231,4 +242,3 @@ The best contributions are those that improve the project while preserving its g
 - Traceability
 
 **Human-controlled. AI-assisted.**
-

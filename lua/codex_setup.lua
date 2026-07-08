@@ -1,4 +1,4 @@
--- Startup sequence for Codex-Neovim implementation
+-- Startup sequence for Neovim-AIDE Codex integration
 local mode = require("codex_mode")
 local codex_cli = require("codex_cli")
 
@@ -81,4 +81,3 @@ vim.keymap.set("n", "<leader>cmm", function()
 	local m = require("codex_mode").cycle()
 	vim.notify("Codex mode: " .. m, vim.log.levels.INFO, { title = "Codex" })
 end, { desc = "Codex: cycle mode" })
-

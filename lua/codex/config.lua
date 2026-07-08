@@ -16,6 +16,17 @@ local config = {
 		min_cli_version = "0.120.0",
 		model_probe_enabled = true,
 	},
+
+	workflow = {
+		default_mode = "fast",
+
+		model_profiles = {
+			fast = "gpt-5.4-mini",
+			balanced = "gpt-5.4-mini",
+			strict = "gpt-5.4-mini",
+			refactor = "gpt-5.4-mini",
+		},
+	},
 }
 
 function M.get()
