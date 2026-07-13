@@ -81,6 +81,16 @@ return {
 				mode = "x",
 				desc = "Preview diff",
 			},
+
+			{
+				"<leader>cP",
+				function()
+					require("codex_cli").safe_preview_confirm_apply_selection()
+				end,
+				mode = "x",
+				desc = "Safe refactor preview selection",
+			},
+
 			{
 				"<leader>cw",
 				function()

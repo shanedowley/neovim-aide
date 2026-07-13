@@ -197,6 +197,7 @@ return {
 				{ "<leader>co", desc = "Open output scratch", mode = "x" },
 				{ "<leader>ca", desc = "Apply inline", mode = "x" },
 				{ "<leader>cd", desc = "Preview diff", mode = "x" },
+				{ "<leader>cP", desc = "Safe refactor preview selection", mode = "x" },
 				{ "<leader>cw", desc = "Write output to file", mode = "x" },
 				{ "<leader>cs", desc = "Scratchpad prompt", mode = "x" },
 
