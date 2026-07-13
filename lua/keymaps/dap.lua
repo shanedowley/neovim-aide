@@ -37,6 +37,15 @@ local function dapui()
 	return ok and m or nil
 end
 
+local function dapui_watches()
+	local ui = dapui()
+	if not ui or not ui.elements or not ui.elements.watches then
+		vim.notify("DAP watches not available", vim.log.levels.WARN)
+		return nil
+	end
+	return ui.elements.watches
+end
+
 local function widgets()
 	local dap = dap_or_nil()
 	if not dap then
@@ -397,8 +406,49 @@ vim.keymap.set("n", "<leader>dm", function()
 	dapui_eval_expr(expr)
 end, { desc = "DAP: Eval custom memory expression" })
 
--- First-cut LLDB watchpoint
+-- Watches / watchpoints
 vim.keymap.set("n", "<leader>dw", function()
+	local watches = dapui_watches()
+	if not watches then
+		return
+	end
+
+	local default = vim.fn.expand("<cword>")
+	local expr = vim.fn.input("Watch expression: ", default)
+
+	if expr == nil or expr == "" then
+		return
+	end
+
+	watches.add(expr)
+	vim.notify("DAP: Added watch expression: " .. expr, vim.log.levels.INFO)
+
+	local ui = dapui()
+	if ui then
+		ui.open()
+	end
+end, { desc = "DAP: Add watch expression" })
+
+vim.keymap.set("n", "<leader>dX", function()
+	local watches = dapui_watches()
+	if not watches then
+		return
+	end
+
+	local current = watches.get()
+	if not current or vim.tbl_count(current) == 0 then
+		vim.notify("DAP: No watch expressions to clear", vim.log.levels.INFO)
+		return
+	end
+
+	for i = #current, 1, -1 do
+		watches.remove(i)
+	end
+
+	vim.notify("DAP: Cleared all watch expressions", vim.log.levels.INFO)
+end, { desc = "DAP: Clear watch expressions" })
+
+vim.keymap.set("n", "<leader>dW", function()
 	local sym = cword_or_nil()
 	if not sym then
 		return
