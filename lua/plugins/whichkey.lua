@@ -170,20 +170,25 @@ return {
 				----------------------------------------------------------------------
 				{ "<leader>c", group = "+codex", mode = { "n", "x" } },
 
-				-- Codex terminal / context (normal only)
-				{ "<leader>ct", desc = "Terminal: Toggle/Open", mode = "n" },
-				{ "<leader>cT", desc = "Terminal: Focus", mode = "n" },
-				{ "<leader>cA", desc = "Terminal: Add file to context", mode = "n" },
-
 				-- Normal mode Codex actions
+				{ "<leader>cc", desc = "Toggle Codex context injection", mode = "n" },
+				{ "<leader>cC", desc = "Show Codex project context", mode = "n" },
+				{ "<leader>cE", desc = "Explain current line", mode = "n" },
 				{ "<leader>cR", desc = "Refactor current function", mode = "n" },
+				{ "<leader>cP", desc = "Safe refactor preview (current function)", mode = "n" },
+				{ "<leader>cD", desc = "Preview diff (current line)", mode = "n" },
+				{ "<leader>cL", desc = "Open Codex log", mode = "n" },
+				{ "<leader>cH", desc = "Codex health check", mode = "n" },
 				{ "<leader>cl", desc = "Run on current line", mode = "n" },
 				{ "<leader>cF", desc = "Run on entire file", mode = "n" },
 				{ "<leader>cp", desc = "Patch buffer (diff)", mode = "n" },
 				{ "<leader>cs", desc = "Scratchpad prompt", mode = "n" },
-				{ "<leader>cE", desc = "Rigorous explain current line", mode = "n" },
-				{ "<leader>ca", desc = "Apply inline (current line)", mode = "n" },
-				{ "<leader>cD", desc = "Preview diff (current line)", mode = "n" },
+				{ "<leader>cS", desc = "Show Codex workflow state", mode = "n" },
+				{ "<leader>cT", desc = "Show Codex latency report", mode = "n" },
+				{ "<leader>cV", desc = "Show Codex prompt version info", mode = "n" },
+				{ "<leader>cX", desc = "Show Codex recovery report", mode = "n" },
+				{ "<leader>c,", desc = "Show last Codex operation", mode = "n" },
+				{ "<leader>c.", desc = "Repeat last Codex prompt", mode = "n" },
 
 				-- Visual mode Codex actions
 				{ "<leader>ce", desc = "Fast explain selection", mode = "x" },
