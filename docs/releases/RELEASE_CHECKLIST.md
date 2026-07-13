@@ -55,6 +55,7 @@ Verify repository health.
 Verify documentation is complete and consistent.
 
 - [ ] README reviewed
+- [ ] README Latest Release section updated
 - [ ] INSTALL reviewed
 - [ ] Documentation index reviewed
 - [ ] Contributor documentation reviewed
@@ -111,7 +112,7 @@ Inside the sandbox:
 
 # Core Workflow Validation
 
-Validate representative AI-assissted development workflows.
+Validate representative AI-assisted development workflows.
 
 - [ ] Explain
 - [ ] Rewrite

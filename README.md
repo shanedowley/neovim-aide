@@ -27,7 +27,22 @@
 
 Neovim-AIDE is an AI-assisted software development IDE for Neovim, built around validation, observability, explicit user control and operational safeguards.
 
-Current Release: R1.3
+## Latest Release
+
+**Current Release: R1.4**
+
+Neovim-AIDE R1.4 is a focused daily-use workflow release.
+
+Highlights:
+
+- improved DAP watches UX
+- visual-mode safe refactor preview for selected code
+- cleaner Codex which-key workflow descriptions
+- cleaner sandbox startup when `yarn` is missing
+
+Read the full release notes:
+
+- [Neovim-AIDE 1.4 Release Notes](docs/releases/RELEASE_NOTES_R1_4.md)
 
 Neovim-AIDE is designed for users who want AI-assisted workflows that remain:
 
