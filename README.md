@@ -9,6 +9,10 @@
 
 ---
 
+## What is Neovim-AIDE?
+
+Neovim-AIDE is a Neovim IDE for AI-assisted software development. It combines coding, debugging, validation, workflow visibility and Codex-powered assistance inside a human-controlled development environment.
+
 ## Ethos
 
 - Neovim-AIDE is an ongoing exploration of how AI can strengthen software development practice without weakening or bypassing human judgement.
@@ -22,10 +26,6 @@
 - All system behaviour should be observable and failures should be recoverable.
 
 - Ultimately the developer remains responsible for all engineering decisions. The system exists to make those decisions safer, clearer, and more informed.
-
-## Introduction
-
-Neovim-AIDE is an AI-assisted software development IDE for Neovim, built around validation, observability, explicit user control and operational safeguards.
 
 ## Latest Release
 
