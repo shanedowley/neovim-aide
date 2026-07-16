@@ -209,6 +209,8 @@ return {
 				{ "<leader>nj", desc = "Next function", mode = "n" },
 				{ "<leader>nk", desc = "Previous function", mode = "n" },
 				{ "<leader>nl", desc = "Function end", mode = "n" },
+				{ "<leader>nt", desc = "Next code marker", mode = "n" },
+				{ "<leader>nT", desc = "Previous code marker", mode = "n" },
 
 				----------------------------------------------------------------------
 				-- LSP
