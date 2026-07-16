@@ -27,6 +27,5 @@ return {
 	{ import = "plugins.whichkey", event = "VeryLazy" },
 	{ import = "plugins.git", event = "BufReadPre" },
 	{ import = "plugins.web", ft = { "html", "css", "javascript", "typescript" } },
-	{ import = "plugins.navigation", keys = "<leader><leader>" },
 	{ import = "plugins.lsp_ui", event = "LspAttach" },
 }

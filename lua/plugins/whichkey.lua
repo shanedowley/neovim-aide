@@ -202,6 +202,15 @@ return {
 				{ "<leader>cs", desc = "Scratchpad prompt", mode = "x" },
 
 				----------------------------------------------------------------------
+				-- NAVIGATION
+				----------------------------------------------------------------------
+				{ "<leader>n", group = "+navigation", mode = "n" },
+				{ "<leader>nh", desc = "Function start", mode = "n" },
+				{ "<leader>nj", desc = "Next function", mode = "n" },
+				{ "<leader>nk", desc = "Previous function", mode = "n" },
+				{ "<leader>nl", desc = "Function end", mode = "n" },
+
+				----------------------------------------------------------------------
 				-- LSP
 				----------------------------------------------------------------------
 				{ "<leader>l", group = "+lsp", mode = "n" },

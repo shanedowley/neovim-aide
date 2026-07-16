@@ -1,6 +1,7 @@
 -- ~/.config/nvim/lua/keymaps/init.lua
 
 require("keymaps.general")
+require("keymaps.navigation")
 require("keymaps.lsp")
 require("keymaps.dap")
 require("keymaps.run")
