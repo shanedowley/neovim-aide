@@ -155,6 +155,13 @@ return {
 				desc = "Explain current line",
 			},
 			{
+				"<leader>cB",
+				function()
+					require("codex_cli").explain_current_buffer()
+				end,
+				desc = "Explain current buffer",
+			},
+			{
 				"<leader>cR",
 				function()
 					require("codex_cli").replace_current_function()

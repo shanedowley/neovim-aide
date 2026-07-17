@@ -174,6 +174,7 @@ return {
 				{ "<leader>cc", desc = "Toggle Codex context injection", mode = "n" },
 				{ "<leader>cC", desc = "Show Codex project context", mode = "n" },
 				{ "<leader>cE", desc = "Explain current line", mode = "n" },
+				{ "<leader>cB", desc = "Explain current buffer", mode = "n" },
 				{ "<leader>cR", desc = "Refactor current function", mode = "n" },
 				{ "<leader>cP", desc = "Safe refactor preview (current function)", mode = "n" },
 				{ "<leader>cD", desc = "Preview diff (current line)", mode = "n" },

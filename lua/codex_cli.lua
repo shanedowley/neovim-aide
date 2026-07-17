@@ -722,6 +722,61 @@ function M.explain_current_line()
 	})
 end
 
+function M.explain_current_buffer()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local buftype = vim.bo[bufnr].buftype
+
+	if buftype ~= "" then
+		vim.notify("Current buffer cannot be explained", vim.log.levels.WARN, { title = "Codex" })
+		return
+	end
+
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local text = table.concat(lines, "\n")
+
+	if vim.trim(text) == "" then
+		vim.notify("Current buffer is empty", vim.log.levels.WARN, { title = "Codex" })
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local buffer_name = vim.api.nvim_buf_get_name(bufnr)
+
+	if buffer_name == "" then
+		buffer_name = "[No Name]"
+	else
+		buffer_name = vim.fn.fnamemodify(buffer_name, ":t")
+	end
+
+	local op_name = "explain_current_buffer"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft),
+		"",
+		"Context:",
+		"- Buffer: " .. buffer_name,
+		"- Filetype: " .. (ft ~= "" and ft or "text"),
+		"- The supplied input is the complete current Neovim buffer, including unsaved changes.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Buffer explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
+end
+
 function M.explain_text(text)
 	local ft = vim.bo.filetype or ""
 	local default_prompt = prompt.build_explain(ft)
