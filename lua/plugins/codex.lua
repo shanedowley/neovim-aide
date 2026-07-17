@@ -6,18 +6,6 @@ return {
 	},
 
 	{
-		"folke/which-key.nvim",
-		opts = function(_, opts)
-			opts = opts or {}
-			opts.spec = opts.spec or {}
-
-			table.insert(opts.spec, { "<leader>c", group = "codex", mode = { "n", "x" } })
-
-			return opts
-		end,
-	},
-
-	{
 		"nvim-lua/plenary.nvim",
 		lazy = true,
 	},
@@ -39,7 +27,7 @@ return {
 					require("codex_cli").explain_selection()
 				end,
 				mode = "x",
-				desc = "Explain selection",
+				desc = "Rigorous explain selection",
 			},
 			{
 				"<leader>ce",
