@@ -700,7 +700,7 @@ end
 function M.explain_current_line()
 	local line = vim.fn.getline(".")
 	local ft = vim.bo.filetype or ""
-	local user_prompt = prompt.build_explain(ft)
+	local user_prompt = prompt.build_explain(ft, "line")
 	local op_name = "explain_current_line"
 
 	remember_and_log_op(op_name, user_prompt)
@@ -750,7 +750,7 @@ function M.explain_current_buffer()
 
 	local op_name = "explain_current_buffer"
 	local user_prompt = table.concat({
-		prompt.build_explain(ft),
+		prompt.build_explain(ft, "buffer"),
 		"",
 		"Context:",
 		"- Buffer: " .. buffer_name,
@@ -779,21 +779,22 @@ end
 
 function M.explain_text(text)
 	local ft = vim.bo.filetype or ""
-	local default_prompt = prompt.build_explain(ft)
+	local op_name = "explain_text"
+	local default_prompt = prompt.build_explain(ft, "selection")
 
 	prompt_user({ prompt = "Codex explain: ", default = default_prompt }, function(user_prompt)
-		remember_and_log_op("explain_text", user_prompt)
+		remember_and_log_op(op_name, user_prompt)
 
 		runner.run_embedded(text, user_prompt, {
-			op = "explain_text",
+			op = op_name,
 			filetype = ft,
 			spinner_message = ui.phase_message(op_name, "running"),
 			stream_output = true,
 			on_success = function(_)
-				set_state_complete("explain_text", 0, "Explanation opened")
+				set_state_complete(op_name, 0, "Explanation opened")
 			end,
 			on_failure = function(result)
-				set_state_failed("explain_text", 0, "Codex execution failed")
+				set_state_failed(op_name, 0, "Codex execution failed")
 				if #result.stderr > 0 then
 					open_scratch(result.stderr, "text", "Codex STDERR")
 				end
@@ -816,7 +817,7 @@ function M.explain_selection()
 			return
 		end
 		local ft = vim.bo.filetype or ""
-		local user_prompt = prompt.build_explain(ft)
+		local user_prompt = prompt.build_explain(ft, "selection")
 
 		remember_and_log_op("explain_selection", user_prompt)
 
@@ -851,7 +852,7 @@ function M.explain_selection_fast()
 			return
 		end
 		local ft = vim.bo.filetype or ""
-		local user_prompt = prompt.build_explain_fast(ft)
+		local user_prompt = prompt.build_explain_fast(ft, "selection")
 
 		remember_and_log_op("explain_selection_fast", user_prompt)
 
