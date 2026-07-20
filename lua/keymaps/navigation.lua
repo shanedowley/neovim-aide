@@ -21,6 +21,11 @@ vim.keymap.set("n", "<leader>nl", navigation.goto_function_end, {
 	silent = true,
 })
 
+vim.keymap.set("n", "<leader>nv", navigation.select_current_function, {
+	desc = "Select current function",
+	silent = true,
+})
+
 vim.keymap.set("n", "<leader>nt", markers.goto_next_marker, {
 	desc = "Next code marker",
 	silent = true,

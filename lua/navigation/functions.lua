@@ -213,4 +213,25 @@ function M.goto_function_end()
 	move_to(node_end_position(node))
 end
 
+function M.select_current_function()
+	local root = get_root()
+	if not root then
+		return
+	end
+
+	local node = enclosing_function(root)
+
+	if not node then
+		notify("Cursor is not inside a function", vim.log.levels.INFO)
+		return
+	end
+
+	local start_row, start_col = node_start_position(node)
+	local end_row, end_col = node_end_position(node)
+
+	move_to(start_row, start_col)
+	vim.cmd("normal! v")
+	move_to(end_row, end_col)
+end
+
 return M
