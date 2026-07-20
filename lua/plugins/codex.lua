@@ -203,14 +203,14 @@ return {
 				function()
 					require("codex_cli").run_current_line()
 				end,
-				desc = "Custom prompt: current line",
+				desc = "Custom rewrite: current line",
 			},
 			{
 				"<leader>cF",
 				function()
 					require("codex_cli").run_entire_file()
 				end,
-				desc = "Custom prompt: entire file",
+				desc = "Custom rewrite: entire file",
 			},
 			{
 				"<leader>cp",
