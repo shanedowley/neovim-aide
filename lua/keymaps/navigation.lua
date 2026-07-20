@@ -26,6 +26,11 @@ vim.keymap.set("n", "<leader>nv", navigation.select_current_function, {
 	silent = true,
 })
 
+vim.keymap.set("n", "<leader>nV", navigation.select_current_class, {
+	desc = "Select current class",
+	silent = true,
+})
+
 vim.keymap.set("n", "<leader>nt", markers.goto_next_marker, {
 	desc = "Next code marker",
 	silent = true,

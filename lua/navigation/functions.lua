@@ -12,6 +12,16 @@ local FUNCTION_TYPES = {
 	method_definition = true,
 }
 
+local CLASS_FILETYPES = {
+	cpp = true,
+	objcpp = true,
+}
+
+local CLASS_TYPES = {
+	class_specifier = true,
+	struct_specifier = true,
+}
+
 local function notify(message, level)
 	vim.notify(message, level or vim.log.levels.INFO, {
 		title = "Navigation",
@@ -23,6 +33,17 @@ local function current_buffer_supported()
 
 	if not SUPPORTED_FILETYPES[filetype] then
 		notify("Function navigation is currently supported for C and C++ buffers", vim.log.levels.WARN)
+		return false
+	end
+
+	return true
+end
+
+local function current_buffer_supports_classes()
+	local filetype = vim.bo.filetype or ""
+
+	if not CLASS_FILETYPES[filetype] then
+		notify("Class selection is currently supported for C++ buffers", vim.log.levels.WARN)
 		return false
 	end
 
@@ -130,6 +151,21 @@ local function enclosing_function(root)
 	return nil
 end
 
+local function enclosing_class(root)
+	local row, col = cursor_position()
+	local node = root:named_descendant_for_range(row, col, row, col)
+
+	while node do
+		if CLASS_TYPES[node:type()] then
+			return node
+		end
+
+		node = node:parent()
+	end
+
+	return nil
+end
+
 local function move_to(row, col)
 	vim.api.nvim_win_set_cursor(0, { row + 1, col })
 end
@@ -223,6 +259,31 @@ function M.select_current_function()
 
 	if not node then
 		notify("Cursor is not inside a function", vim.log.levels.INFO)
+		return
+	end
+
+	local start_row, start_col = node_start_position(node)
+	local end_row, end_col = node_end_position(node)
+
+	move_to(start_row, start_col)
+	vim.cmd("normal! v")
+	move_to(end_row, end_col)
+end
+
+function M.select_current_class()
+	if not current_buffer_supports_classes() then
+		return
+	end
+
+	local root = get_root()
+	if not root then
+		return
+	end
+
+	local node = enclosing_class(root)
+
+	if not node then
+		notify("Cursor is not inside a class or struct", vim.log.levels.INFO)
 		return
 	end
 
