@@ -170,6 +170,31 @@ local function move_to(row, col)
 	vim.api.nvim_win_set_cursor(0, { row + 1, col })
 end
 
+local function current_function_node()
+	local root = get_root()
+	if not root then
+		return nil
+	end
+
+	local node = enclosing_function(root)
+
+	if not node then
+		notify("Cursor is not inside a function", vim.log.levels.INFO)
+		return nil
+	end
+
+	return node
+end
+
+function M.current_function_text()
+	local node = current_function_node()
+	if not node then
+		return nil
+	end
+
+	return vim.treesitter.get_node_text(node, 0)
+end
+
 function M.goto_previous_function()
 	local root = get_root()
 	if not root then
@@ -218,15 +243,8 @@ function M.goto_next_function()
 end
 
 function M.goto_function_start()
-	local root = get_root()
-	if not root then
-		return
-	end
-
-	local node = enclosing_function(root)
-
+	local node = current_function_node()
 	if not node then
-		notify("Cursor is not inside a function", vim.log.levels.INFO)
 		return
 	end
 
@@ -234,15 +252,8 @@ function M.goto_function_start()
 end
 
 function M.goto_function_end()
-	local root = get_root()
-	if not root then
-		return
-	end
-
-	local node = enclosing_function(root)
-
+	local node = current_function_node()
 	if not node then
-		notify("Cursor is not inside a function", vim.log.levels.INFO)
 		return
 	end
 
@@ -250,15 +261,8 @@ function M.goto_function_end()
 end
 
 function M.select_current_function()
-	local root = get_root()
-	if not root then
-		return
-	end
-
-	local node = enclosing_function(root)
-
+	local node = current_function_node()
 	if not node then
-		notify("Cursor is not inside a function", vim.log.levels.INFO)
 		return
 	end
 

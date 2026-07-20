@@ -150,6 +150,13 @@ return {
 				desc = "Explain current buffer",
 			},
 			{
+				"<leader>cU",
+				function()
+					require("codex_cli").explain_current_function()
+				end,
+				desc = "Explain current function",
+			},
+			{
 				"<leader>cR",
 				function()
 					require("codex_cli").replace_current_function()

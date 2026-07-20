@@ -4,6 +4,7 @@ local M = {} -- module table
 local parse = require("codex_parse")
 local prompt = require("codex_prompt")
 local mode = require("codex_mode")
+local navigation = require("navigation.functions")
 local codex_log = require("codex_log")
 local recovery = require("codex_recovery")
 local guard = require("codex_guard")
@@ -801,6 +802,42 @@ function M.explain_text(text)
 			end,
 		})
 	end)
+end
+
+function M.explain_current_function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_function_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "explain_current_function"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing function at the cursor.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Function explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
 end
 
 function M.explain_selection()
