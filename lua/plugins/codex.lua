@@ -157,6 +157,13 @@ return {
 				desc = "Explain current function",
 			},
 			{
+				"<leader>cK",
+				function()
+					require("codex_cli").explain_current_class()
+				end,
+				desc = "Explain current class",
+			},
+			{
 				"<leader>cR",
 				function()
 					require("codex_cli").replace_current_function()
@@ -196,14 +203,14 @@ return {
 				function()
 					require("codex_cli").run_current_line()
 				end,
-				desc = "Run on current line",
+				desc = "Custom prompt: current line",
 			},
 			{
 				"<leader>cF",
 				function()
 					require("codex_cli").run_entire_file()
 				end,
-				desc = "Run on entire file",
+				desc = "Custom prompt: entire file",
 			},
 			{
 				"<leader>cp",

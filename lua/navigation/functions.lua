@@ -186,6 +186,26 @@ local function current_function_node()
 	return node
 end
 
+local function current_class_node()
+	if not current_buffer_supports_classes() then
+		return nil
+	end
+
+	local root = get_root()
+	if not root then
+		return nil
+	end
+
+	local node = enclosing_class(root)
+
+	if not node then
+		notify("Cursor is not inside a class or struct", vim.log.levels.INFO)
+		return nil
+	end
+
+	return node
+end
+
 function M.current_function_text()
 	local node = current_function_node()
 	if not node then
@@ -274,20 +294,18 @@ function M.select_current_function()
 	move_to(end_row, end_col)
 end
 
-function M.select_current_class()
-	if not current_buffer_supports_classes() then
-		return
-	end
-
-	local root = get_root()
-	if not root then
-		return
-	end
-
-	local node = enclosing_class(root)
-
+function M.current_class_text()
+	local node = current_class_node()
 	if not node then
-		notify("Cursor is not inside a class or struct", vim.log.levels.INFO)
+		return nil
+	end
+
+	return vim.treesitter.get_node_text(node, 0)
+end
+
+function M.select_current_class()
+	local node = current_class_node()
+	if not node then
 		return
 	end
 

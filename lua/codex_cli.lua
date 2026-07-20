@@ -840,6 +840,43 @@ function M.explain_current_function()
 	})
 end
 
+function M.explain_current_class()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_class_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "explain_current_class"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing class or struct at the cursor.",
+		"- Explain its purpose, responsibilities, state, methods, dependencies, and important design considerations.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Class explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
+end
+
 function M.explain_selection()
 	local ui = require("codex.ui")
 
