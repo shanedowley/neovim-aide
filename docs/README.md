@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE.
+> A Neovim IDE
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -13,23 +13,33 @@
 
 Welcome to the documentation for **Neovim-AIDE**.
 
-Neovim-AIDE is an **AI-Assisted IDE based on Neovim**.
+This documentation provides a guide to installing, using and contributing to Neovim-AIDE.
 
-This documentation is organised to help you quickly find the information you need, whether you are using Neovim-AIDE in your daily software development workflow or contributing to its development.
+Whether you are using Neovim-AIDE in your daily software development workflow or contributing to the project, these guides are intended to help you quickly find the information you need.
 
 ---
 
 # Getting Started
 
-### I want to use Neovim-AIDE
+## I want to use Neovim-AIDE
 
-Begin with the project README.
+Begin with:
 
-From there you can install Neovim-AIDE, complete the bootstrap process and start using the available AI-assisted workflows.
+```text
+README.md
+```
+
+Then continue with:
+
+```text
+INSTALL.md
+```
+
+The README introduces Neovim-AIDE, while the installation guide covers installation, bootstrap, validation and your first AI-assisted workflow.
 
 ---
 
-### I want to contribute to Neovim-AIDE
+## I want to contribute to Neovim-AIDE
 
 Begin with:
 
@@ -37,7 +47,7 @@ Begin with:
 CONTRIBUTING.md
 ```
 
-The contributor guide explains the project's engineering philosophy, development workflow and contribution expectations.
+The contributor guide explains the project's development philosophy, contribution workflow and expectations for submitting changes.
 
 ---
 
@@ -45,15 +55,16 @@ The contributor guide explains the project's engineering philosophy, development
 
 The documentation is organised into a small number of focused guides.
 
-Each document has a single primary responsibility.
-
-| Document          | Purpose                                                                                                        |
-| ----------------- | -------------------------------------------------------------------------------------------------------------- |
-| `ARCHITECTURE.md` | Explains how Neovim-AIDE is designed and how its major runtime subsystems work together.                       |
-| `CONTRIBUTING.md` | Explains how contributors are expected to develop, validate and submit changes.                                |
-| `COMMANDS.md`     | Reference for the available Neovim-AIDE commands.                                                              |
-| `contributor/`    | Additional contributor documentation covering engineering workflows, validation and project-specific guidance. |
-| `releases/`       | Historical release notes and release documentation.                                                            |
+| Document          | Purpose                                                            |
+| ----------------- | ------------------------------------------------------------------ |
+| `README.md`       | Product overview and quick start                                   |
+| `INSTALL.md`      | Installation, bootstrap and validation                             |
+| `COMMANDS.md`     | Reference for commands, key mappings and AI-assisted workflows     |
+| `ARCHITECTURE.md` | Explains the runtime architecture and major subsystems             |
+| `CONTRIBUTING.md` | Contributor workflow, philosophy and development practices         |
+| `INSTALL.md`      | Guidence for Neovim-AIDE installation and first time set up        |
+| `contributor/`    | Additional contributor guidance and project-specific documentation |
+| `releases/`       | Historical release notes and release documentation                 |
 
 ---
 
@@ -63,6 +74,7 @@ Each document has a single primary responsibility.
 docs/
 │
 ├── ARCHITECTURE.md
+├── COMMANDS.md
 ├── CONTRIBUTING.md
 ├── README.md
 │
@@ -73,9 +85,11 @@ docs/
 
 The documentation is intentionally organised so that each guide answers a different question.
 
-- **README** — Where do I start?
-- **Architecture** — How is Neovim-AIDE put together?
-- **Contributing** — How do I contribute?
+- **README** — What is Neovim-AIDE?
+- **INSTALL** — How do I install and validate it?
+- **COMMANDS** — Which commands and workflows are available?
+- **ARCHITECTURE** — How is Neovim-AIDE put together?
+- **CONTRIBUTING** — How do I contribute?
 - **Contributor Guides** — How does the project work in practice?
 - **Release Documentation** — What changed in each release?
 
@@ -85,7 +99,7 @@ This separation keeps individual documents concise while reducing duplication ac
 
 # Documentation Principles
 
-The documentation follows the same engineering principles as the software itself.
+The documentation follows the same principles as the software itself.
 
 Documentation should be:
 
@@ -114,7 +128,9 @@ The objective is for the documentation to remain aligned with the shipped produc
 If you cannot find the information you are looking for:
 
 - review the project README
-- consult the relevant guide listed above
-- open a discussion or issue on GitHub if you believe documentation is missing or unclear
+- follow the documentation map above
+- consult the relevant guide
+- open a GitHub discussion or issue if you believe documentation is missing or unclear
 
 Improving documentation is always a welcome contribution.
+
