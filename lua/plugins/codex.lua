@@ -164,6 +164,13 @@ return {
 				desc = "Explain current class",
 			},
 			{
+				"<leader>ck",
+				function()
+					require("codex_cli").review_current_class()
+				end,
+				desc = "Review current class",
+			},
+			{
 				"<leader>cR",
 				function()
 					require("codex_cli").replace_current_function()
