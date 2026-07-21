@@ -3,36 +3,34 @@
 > A Neovim IDE
 > Human-controlled. AI-assisted.
 
-## AI Engine
+## Runtime Engine
 
-**Codex**
+**Codex CLI**
 
 ---
-
-# Contributing
 
 # Contributing to Neovim-AIDE
 
 Thank you for taking an interest in contributing to Neovim-AIDE.
 
-Neovim-AIDE is an **AI-Assisted IDE based on Neovim**.
+Neovim-AIDE is an AI-assisted IDE built on Neovim.
 
 The project is built around a simple principle:
 
 > **Human-controlled. AI-assisted.**
 
-We welcome contributions that improve the reliability, maintainability and usability of the project while preserving its core engineering philosophy.
+We welcome contributions that improve the reliability, maintainability and usability of the project while preserving its core development philosophy.
 
 ---
 
 # Project Philosophy
 
-Neovim-AIDE is intentionally designed as an engineering environment rather than an autonomous AI coding system.
+Neovim-AIDE is intentionally designed as a developer environment rather than an autonomous AI coding system.
 
 The project prioritises:
 
 - correctness
-- explicit user control
+- explicit developer control
 - operational visibility
 - validation
 - traceability
@@ -42,16 +40,16 @@ The architecture assumes:
 
 - AI-generated code can be incorrect.
 - Development environments can degrade.
-- Engineers should remain in control of decisions.
-- AI should assist engineering workflows rather than replace them.
+- Developers remain responsible for decisions.
+- AI should assist development workflows rather than replace them.
 
 Features that reduce visibility, bypass validation or introduce opaque automation are unlikely to align with the goals of the project.
 
 ---
 
-# Engineering Workflow
+# Development Workflow
 
-Neovim-AIDE has been developed using a disciplined, incremental engineering process.
+Neovim-AIDE has been developed using a disciplined, incremental development process.
 
 Contributors are encouraged to follow the same approach.
 
@@ -64,6 +62,8 @@ Design
     ↓
 Implement
     ↓
+Review
+    ↓
 Validate
     ↓
 Commit
@@ -75,10 +75,11 @@ In practice this means:
 - make small, focused changes
 - complete one story at a time
 - avoid speculative refactoring
+- review changes before committing
 - validate behaviour before merging
 - prefer incremental improvement over large rewrites
 
-Engineering confidence is valued more highly than feature velocity.
+Development confidence is valued more highly than feature velocity.
 
 ---
 
@@ -87,7 +88,8 @@ Engineering confidence is valued more highly than feature velocity.
 Contributions are welcome in areas including:
 
 - documentation
-- workflow improvements
+- developer workflow improvements
+- navigation and editing workflows
 - operational observability
 - runtime validation
 - installation and bootstrap
@@ -121,6 +123,8 @@ Submit
 
 Sandbox-first validation helps identify installation issues, dependency problems and behavioural regressions before they reach other users.
 
+It is considered a core development practice for the project and should be used whenever practical.
+
 ---
 
 # Code Style
@@ -131,6 +135,7 @@ General guidelines include:
 
 - prefer readability over cleverness
 - keep functions focused
+- favour focused modules with a single primary responsibility
 - minimise unnecessary complexity
 - favour explicit behaviour over hidden side effects
 - use descriptive names
@@ -146,6 +151,7 @@ Contributors should verify that changes behave as intended before submitting the
 
 Depending on the nature of the change, this may include:
 
+- sandbox validation
 - runtime validation
 - bootstrap verification
 - workflow testing
@@ -159,16 +165,16 @@ Documentation updates should accompany behavioural or architectural changes wher
 
 # Safety Expectations
 
-Neovim-AIDE deliberately favours explicit engineering workflows over autonomous behaviour.
+Neovim-AIDE deliberately favours explicit development workflows over autonomous behaviour.
 
 Contributions should preserve that philosophy.
 
 In particular:
 
-- preserve explicit user confirmation
+- preserve explicit developer confirmation
 - avoid silent source-code modification
 - avoid hidden background automation
-- maintain workflow visibility
+- maintain observable workflow state
 - preserve validation before application
 
 Operational visibility is considered a feature rather than an implementation detail.
@@ -181,6 +187,7 @@ Good pull requests are:
 
 - focused
 - incremental
+- easy to review
 - well described
 - technically justified
 - appropriately documented
@@ -192,7 +199,7 @@ Large pull requests that combine unrelated changes are more difficult to review 
 
 # Documentation
 
-Documentation is considered part of the product rather than an afterthought.
+Documentation is considered part of the product and should evolve alongside the implementation.
 
 Contributors making behavioural or architectural changes should update relevant documentation where appropriate.
 
@@ -223,19 +230,19 @@ The following types of changes are unlikely to align with the goals of the proje
 - hidden background mutation
 - opaque automation
 - unnecessary architectural complexity
-- features that reduce user control
+- features that reduce developer control
 
-Neovim-AIDE deliberately favours explicit engineering over invisible automation.
+Neovim-AIDE deliberately favours explicit development over invisible automation.
 
 ---
 
 # Community
 
-Constructive discussion, thoughtful engineering trade-offs and respectful collaboration are encouraged.
+Constructive discussion, thoughtful development trade-offs and respectful collaboration are encouraged.
 
 Questions, ideas and well-reasoned proposals are always welcome.
 
-The best contributions are those that improve the project while preserving its guiding principles:
+The best contributions improve the project while preserving its guiding principles:
 
 - Correctness
 - Control

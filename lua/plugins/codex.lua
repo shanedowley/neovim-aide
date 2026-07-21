@@ -6,18 +6,6 @@ return {
 	},
 
 	{
-		"folke/which-key.nvim",
-		opts = function(_, opts)
-			opts = opts or {}
-			opts.spec = opts.spec or {}
-
-			table.insert(opts.spec, { "<leader>c", group = "codex", mode = { "n", "x" } })
-
-			return opts
-		end,
-	},
-
-	{
 		"nvim-lua/plenary.nvim",
 		lazy = true,
 	},
@@ -39,7 +27,7 @@ return {
 					require("codex_cli").explain_selection()
 				end,
 				mode = "x",
-				desc = "Explain selection",
+				desc = "Rigorous explain selection",
 			},
 			{
 				"<leader>ce",
@@ -155,6 +143,34 @@ return {
 				desc = "Explain current line",
 			},
 			{
+				"<leader>cB",
+				function()
+					require("codex_cli").explain_current_buffer()
+				end,
+				desc = "Explain current buffer",
+			},
+			{
+				"<leader>cU",
+				function()
+					require("codex_cli").explain_current_function()
+				end,
+				desc = "Explain current function",
+			},
+			{
+				"<leader>cK",
+				function()
+					require("codex_cli").explain_current_class()
+				end,
+				desc = "Explain current class",
+			},
+			{
+				"<leader>ck",
+				function()
+					require("codex_cli").review_current_class()
+				end,
+				desc = "Review current class",
+			},
+			{
 				"<leader>cR",
 				function()
 					require("codex_cli").replace_current_function()
@@ -194,14 +210,14 @@ return {
 				function()
 					require("codex_cli").run_current_line()
 				end,
-				desc = "Run on current line",
+				desc = "Custom rewrite: current line",
 			},
 			{
 				"<leader>cF",
 				function()
 					require("codex_cli").run_entire_file()
 				end,
-				desc = "Run on entire file",
+				desc = "Custom rewrite: entire file",
 			},
 			{
 				"<leader>cp",
@@ -240,6 +256,13 @@ return {
 					require("codex_cli").show_latency()
 				end,
 				desc = "Show Codex latency report",
+			},
+			{
+				"<leader>cu",
+				function()
+					require("codex_cli").review_current_function()
+				end,
+				desc = "Review current function",
 			},
 			{
 				"<leader>cV",

@@ -128,6 +128,7 @@ local operation_labels = {
 	explain_selection = "explain",
 	explain_selection_fast = "fast explain",
 	explain_current_line = "explain",
+	explain_current_buffer = "explain buffer",
 	explain_text = "explain",
 
 	replace_selection = "replace selection",

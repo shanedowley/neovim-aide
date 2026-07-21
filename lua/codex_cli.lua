@@ -4,6 +4,7 @@ local M = {} -- module table
 local parse = require("codex_parse")
 local prompt = require("codex_prompt")
 local mode = require("codex_mode")
+local navigation = require("navigation.functions")
 local codex_log = require("codex_log")
 local recovery = require("codex_recovery")
 local guard = require("codex_guard")
@@ -700,7 +701,7 @@ end
 function M.explain_current_line()
 	local line = vim.fn.getline(".")
 	local ft = vim.bo.filetype or ""
-	local user_prompt = prompt.build_explain(ft)
+	local user_prompt = prompt.build_explain(ft, "line")
 	local op_name = "explain_current_line"
 
 	remember_and_log_op(op_name, user_prompt)
@@ -722,29 +723,158 @@ function M.explain_current_line()
 	})
 end
 
+function M.explain_current_buffer()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local buftype = vim.bo[bufnr].buftype
+
+	if buftype ~= "" then
+		vim.notify("Current buffer cannot be explained", vim.log.levels.WARN, { title = "Codex" })
+		return
+	end
+
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local text = table.concat(lines, "\n")
+
+	if vim.trim(text) == "" then
+		vim.notify("Current buffer is empty", vim.log.levels.WARN, { title = "Codex" })
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local buffer_name = vim.api.nvim_buf_get_name(bufnr)
+
+	if buffer_name == "" then
+		buffer_name = "[No Name]"
+	else
+		buffer_name = vim.fn.fnamemodify(buffer_name, ":t")
+	end
+
+	local op_name = "explain_current_buffer"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft, "buffer"),
+		"",
+		"Context:",
+		"- Buffer: " .. buffer_name,
+		"- Filetype: " .. (ft ~= "" and ft or "text"),
+		"- The supplied input is the complete current Neovim buffer, including unsaved changes.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Buffer explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
+end
+
 function M.explain_text(text)
 	local ft = vim.bo.filetype or ""
-	local default_prompt = prompt.build_explain(ft)
+	local op_name = "explain_text"
+	local default_prompt = prompt.build_explain(ft, "selection")
 
 	prompt_user({ prompt = "Codex explain: ", default = default_prompt }, function(user_prompt)
-		remember_and_log_op("explain_text", user_prompt)
+		remember_and_log_op(op_name, user_prompt)
 
 		runner.run_embedded(text, user_prompt, {
-			op = "explain_text",
+			op = op_name,
 			filetype = ft,
 			spinner_message = ui.phase_message(op_name, "running"),
 			stream_output = true,
 			on_success = function(_)
-				set_state_complete("explain_text", 0, "Explanation opened")
+				set_state_complete(op_name, 0, "Explanation opened")
 			end,
 			on_failure = function(result)
-				set_state_failed("explain_text", 0, "Codex execution failed")
+				set_state_failed(op_name, 0, "Codex execution failed")
 				if #result.stderr > 0 then
 					open_scratch(result.stderr, "text", "Codex STDERR")
 				end
 			end,
 		})
 	end)
+end
+
+function M.explain_current_function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_function_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "explain_current_function"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing function at the cursor.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Function explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
+end
+
+function M.explain_current_class()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_class_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "explain_current_class"
+	local user_prompt = table.concat({
+		prompt.build_explain(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing class or struct at the cursor.",
+		"- Explain its purpose, responsibilities, state, methods, dependencies, and important design considerations.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+		stream_output = true,
+		on_success = function(_)
+			set_state_complete(op_name, bufnr, "Class explanation opened")
+		end,
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+			if #result.stderr > 0 then
+				open_scratch(result.stderr, "text", "Codex STDERR")
+			end
+		end,
+	})
 end
 
 function M.explain_selection()
@@ -761,7 +891,7 @@ function M.explain_selection()
 			return
 		end
 		local ft = vim.bo.filetype or ""
-		local user_prompt = prompt.build_explain(ft)
+		local user_prompt = prompt.build_explain(ft, "selection")
 
 		remember_and_log_op("explain_selection", user_prompt)
 
@@ -796,7 +926,7 @@ function M.explain_selection_fast()
 			return
 		end
 		local ft = vim.bo.filetype or ""
-		local user_prompt = prompt.build_explain_fast(ft)
+		local user_prompt = prompt.build_explain_fast(ft, "selection")
 
 		remember_and_log_op("explain_selection_fast", user_prompt)
 
@@ -816,6 +946,119 @@ function M.explain_selection_fast()
 			end,
 		})
 	end)
+end
+
+function M.review_current_function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_function_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "review_current_function"
+
+	local user_prompt = table.concat({
+		prompt.build_review(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing function at the cursor.",
+		"- Review it as production-quality code.",
+		"- Focus on correctness, readability, maintainability, robustness, and potential defects.",
+		"- Do not rewrite the code.",
+		"- Do not produce a patch.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+
+		on_success = function(result)
+			local body = parse.prefer_clean_answer(result.output)
+			body = selection.collapse_if_doubled(body, nil)
+
+			set_state_complete(op_name, bufnr, "Function review opened")
+			open_scratch(body, nil, "Codex Function Review")
+		end,
+
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+
+			if #result.stderr > 0 then
+				recovery.show_failure({
+					kind = "codex_exec_failed",
+					stage = "codex_exec",
+					op = op_name,
+					mode = mode.current(),
+					file = current_file(bufnr),
+					reason = "Codex execution failed",
+					title = "Codex STDERR",
+					lines = result.stderr,
+				})
+			end
+		end,
+	})
+end
+
+function M.review_current_class()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_class_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "review_current_class"
+
+	local user_prompt = table.concat({
+		prompt.build_review(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing class or struct at the cursor.",
+		"- Review it as production-quality code.",
+		"- Focus on correctness, readability, maintainability, robustness, design, and potential defects.",
+		"- Consider responsibilities, state, methods, dependencies, cohesion, and encapsulation.",
+		"- Do not rewrite the code.",
+		"- Do not produce a patch.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+
+		on_success = function(result)
+			local body = parse.prefer_clean_answer(result.output)
+			body = selection.collapse_if_doubled(body, nil)
+
+			set_state_complete(op_name, bufnr, "Class review opened")
+			open_scratch(body, nil, "Codex Class Review")
+		end,
+
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+
+			if #result.stderr > 0 then
+				recovery.show_failure({
+					kind = "codex_exec_failed",
+					stage = "codex_exec",
+					op = op_name,
+					mode = mode.current(),
+					file = current_file(bufnr),
+					reason = "Codex execution failed",
+					title = "Codex STDERR",
+					lines = result.stderr,
+				})
+			end
+		end,
+	})
 end
 
 function M.apply_inline_current_line()

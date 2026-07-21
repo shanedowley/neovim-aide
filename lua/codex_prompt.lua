@@ -33,6 +33,123 @@ function M.is_c_family(ft)
 	return C_FAMILY[ft or ""] == true
 end
 
+local DOCUMENT_FILETYPES = {
+	markdown = true,
+	markdown_inline = true,
+	rst = true,
+	asciidoc = true,
+	tex = true,
+}
+
+local CONFIG_FILETYPES = {
+	json = true,
+	jsonc = true,
+	yaml = true,
+	toml = true,
+	xml = true,
+	dosini = true,
+	conf = true,
+	properties = true,
+}
+
+local TEXT_FILETYPES = {
+	[""] = true,
+	text = true,
+}
+
+local function explain_kind(ft)
+	ft = ft or ""
+
+	if DOCUMENT_FILETYPES[ft] then
+		return "document"
+	end
+
+	if CONFIG_FILETYPES[ft] then
+		return "config"
+	end
+
+	if TEXT_FILETYPES[ft] then
+		return "text"
+	end
+
+	return "code"
+end
+
+local EXPLAIN_FT_LABELS = {
+	markdown = "Markdown",
+	markdown_inline = "Markdown",
+	rst = "reStructuredText",
+	asciidoc = "AsciiDoc",
+	tex = "LaTeX",
+	json = "JSON",
+	jsonc = "JSON with comments",
+	yaml = "YAML",
+	toml = "TOML",
+	xml = "XML",
+	dosini = "INI",
+	conf = "configuration",
+	properties = "properties",
+	c = "C",
+	cpp = "C++",
+	objc = "Objective-C",
+	objcpp = "Objective-C++",
+	cuda = "CUDA",
+	lua = "Lua",
+	python = "Python",
+	javascript = "JavaScript",
+	javascriptreact = "JavaScript React",
+	typescript = "TypeScript",
+	typescriptreact = "TypeScript React",
+	rust = "Rust",
+	go = "Go",
+	sh = "shell",
+	zsh = "Zsh",
+	bash = "Bash",
+}
+
+local function explain_subject(ft, scope)
+	ft = ft or ""
+	scope = scope or "selection"
+
+	local kind = explain_kind(ft)
+	local label = EXPLAIN_FT_LABELS[ft] or (ft ~= "" and ft or "text")
+
+	if kind == "document" then
+		if scope == "buffer" then
+			return "this complete " .. label .. " document"
+		elseif scope == "line" then
+			return "this line from a " .. label .. " document"
+		end
+		return "this selected " .. label .. " content"
+	end
+
+	if kind == "config" then
+		if scope == "buffer" then
+			return "this complete " .. label .. " configuration or structured data"
+		elseif scope == "line" then
+			return "this line from a " .. label .. " configuration or structured data"
+		end
+		return "this selected " .. label .. " configuration or structured-data content"
+	end
+
+	if kind == "text" then
+		if scope == "buffer" then
+			return "this complete text document"
+		elseif scope == "line" then
+			return "this line of text"
+		end
+		return "this selected text"
+	end
+
+	if scope == "buffer" then
+		return "this complete " .. label .. " source file"
+	elseif scope == "line" then
+		return "this line of " .. label .. " code"
+	end
+
+	return "this selected " .. label .. " code"
+end
+
 local FENCE_FT_MAP = {
 	[""] = "text",
 	text = "text",
@@ -73,43 +190,72 @@ local function maybe_with_context(body)
 	return ctx .. "\n\n" .. body
 end
 
-function M.build_explain(ft)
+function M.build_explain(ft, scope)
 	ft = ft or ""
+	scope = scope or "selection"
 
 	if M.is_c_family(ft) then
 		local template = store.get("explain_c")
-		local base = with_header(template)
+		local rendered = substitute(template, {
+			subject = explain_subject(ft, scope),
+		})
+		local base = with_header(rendered)
 		local profile = mode.get()
 		return base .. (profile.explain_suffix or "")
 	end
 
 	local template = store.get("explain_generic")
-	local label = (ft ~= "" and ft) or "code"
 	local rendered = substitute(template, {
-		filetype = label,
+		subject = explain_subject(ft, scope),
 	})
 	local base = with_header(rendered)
 	local profile = mode.get()
 	return base .. (profile.explain_suffix or "")
 end
 
-function M.build_explain_fast(ft)
+function M.build_explain_fast(ft, scope)
 	ft = ft or ""
-	local lang = M.fence_lang(ft)
+	scope = scope or "selection"
 
 	local body = table.concat({
-		"Explain this " .. lang .. " snippet briefly.",
+		"Explain " .. explain_subject(ft, scope) .. " briefly.",
 		"",
 		"Rules:",
-		"- Focus only on what matters in this snippet.",
+		"- Focus only on what matters in the supplied content.",
 		"- Maximum 6 bullets.",
 		"- Mention undefined behavior only if directly relevant.",
 		"- Mention compile-time issues only if directly relevant.",
-		"- Do not rewrite the code.",
+		"- Do not rewrite the content.",
 		"- Be concise.",
 	}, "\n")
 
 	return with_header(body)
+end
+
+function M.build_review(ft, scope)
+	ft = ft or ""
+	scope = scope or "selection"
+
+	local body = table.concat({
+		"Review " .. explain_subject(ft, scope) .. ".",
+		"",
+		"Focus on:",
+		"- correctness",
+		"- readability",
+		"- maintainability",
+		"- robustness",
+		"- potential bugs",
+		"- opportunities for simplification",
+		"",
+		"Do not rewrite the code.",
+		"Do not produce a patch.",
+		"Provide a concise developer review.",
+	}, "\n")
+
+	local base = with_header(body)
+	local profile = mode.get()
+
+	return base .. (profile.explain_suffix or "")
 end
 
 function M.build_apply(user_instruction, selected_text)

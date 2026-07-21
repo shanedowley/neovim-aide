@@ -3,21 +3,19 @@
 > A Neovim IDE
 > Human-controlled. AI-assisted.
 
-## AI Engine
+## Runtime Engine
 
-**Codex**
+**Codex CLI**
 
 ---
 
-# Architecture
-
 # Neovim-AIDE Architecture
 
-Neovim-AIDE is an AI-Assisted IDE for Neovim.
+Neovim-AIDE is an AI-assisted IDE for Neovim.
 
 This document describes the architecture of the shipped system, the responsibilities of its major runtime subsystems, and the engineering principles that guide their design.
 
-The architecture is intentionally conservative. Rather than maximising automation, it emphasises correctness, explicit control and operational visibility.
+The architecture is intentionally conservative. Rather than maximising automation, it emphasises correctness, explicit developer control and operational visibility.
 
 ---
 
@@ -27,15 +25,15 @@ The design of Neovim-AIDE is guided by a small number of engineering principles.
 
 ## Correctness
 
-Safe engineering outcomes take precedence over automation.
+Safe development outcomes take precedence over automation.
 
 ## Control
 
-Developers remain responsible for engineering decisions. AI assists the workflow but does not replace human judgement.
+Developers remain responsible for development decisions. AI assists the workflow but does not replace human judgement.
 
 ## Traceability
 
-Workflow execution should be be observable, understandable and diagnosable.
+Workflow execution should remain observable, understandable and diagnosable.
 
 ## Operational Visibility
 
@@ -43,7 +41,7 @@ The system should make its current state, progress and failures visible rather t
 
 ## Human-controlled. AI-assisted.
 
-AI is treated as an engineering tool operating within explicit workflows rather than an autonomous agent.
+AI is treated as a development tool operating within explicit workflows rather than an autonomous agent.
 
 ---
 
@@ -54,60 +52,66 @@ Neovim-AIDE consists of a set of cooperating runtime subsystems.
 Each subsystem has a clearly defined responsibility.
 
 ```text
-                  User
-                    │
-          Commands / Keymaps
-                    │
-             Workflow Layer
-                    │
-         Prompt Construction
-                    │
-        Runner & Preflight Checks
-                    │
-      Runtime Health Validation
-                    │
-          AI Model Execution
-                    │
-     Report & Preview Generation
-                    │
- Validation & Explicit Confirmation
-                    │
-            Apply Changes
-                    │
- Logging • Runtime State • Metrics
+                  Developer
+                      │
+            Commands / Key Mappings
+                      │
+             Workflow Coordination
+                      │
+            Prompt Construction
+                      │
+           Runner Coordination
+                      │
+       Health & Execution Readiness
+                      │
+               AI Execution
+                      │
+             Streaming Output
+                      │
+          Report & Preview Generation
+                      │
+      Validation & Explicit Confirmation
+                      │
+               Apply Changes
+                      │
+     State • Logging • Recovery • Metrics
 ```
 
-The architecture intentionally provides a single, predictable workflow regardless of the AI-assisted operation being performed.
+The architecture intentionally provides a single, predictable execution model regardless of the AI-assisted operation being performed.
 
 ---
 
 # Runtime Workflow
 
-Every AI-assisted workflow follows the same execution lifecycle.
+AI-assisted workflows share a common execution foundation, while their final stages depend on whether the operation is read-only or modifies project files.
 
 ```text
 User Request
       ↓
-Construct Prompt
+Workflow Selection
       ↓
-Runner Preflight
+Prompt Construction
       ↓
-Runtime Health Check
+Runner Coordination
       ↓
-Execute AI Request
+Runtime Health Validation
       ↓
-Generate Report
+AI Execution
       ↓
-Preview Changes
+Streaming Output
       ↓
-Validate
+Structured Report
       ↓
-Explicit Confirmation
+Read-only Result
+        or
+Preview → Validation → Explicit Confirmation → Apply
       ↓
-Apply Changes
+State / Logging / Metrics
 ```
 
-This common lifecycle keeps behaviour predictable, simplifies debugging and makes operational state easy to understand.
+Explain, review and diagnostic workflows conclude with a structured result. Workflows that propose source changes continue through preview, validation and explicit developer confirmation before anything is applied.
+
+This shared execution foundation keeps behaviour predictable, simplifies debugging and makes operational state easy to understand.
 
 ---
 
@@ -123,14 +127,15 @@ This separation keeps the architecture understandable, maintainable and testable
 
 ## Workflow
 
-The workflow subsystem provides the user-facing entry point into Neovim-AIDE.
+The workflow subsystem provides the primary entry point into Neovim-AIDE.
 
-It is responsible for initiating AI-assisted operations and coordinating the overall execution lifecycle.
+It coordinates every AI-assisted workflow from initial request through completion.
 
 Responsibilities include:
 
 - user commands
 - key mappings
+- workflow selection
 - workflow orchestration
 - lifecycle coordination
 
@@ -138,14 +143,14 @@ Responsibilities include:
 
 ## Prompt Construction
 
-Prompt construction transforms user intent into structured prompts suitable for AI execution.
+Prompt construction transforms developer intent into structured prompts suitable for AI execution.
 
 Responsibilities include:
 
 - prompt templates
 - instruction construction
-- source context
-- language context
+- project context injection
+- language-aware prompting
 - prompt versioning
 
 ---
@@ -154,7 +159,7 @@ Responsibilities include:
 
 The runner is the central orchestration component.
 
-It coordinates execution from preflight validation through completion and ensures that workflow stages execute in the correct order.
+It coordinates execution from workflow initiation through completion and ensures that each stage executes in the correct order.
 
 Responsibilities include:
 
@@ -168,13 +173,13 @@ Responsibilities include:
 
 ## Runtime Health
 
-The runtime health subsystem determines whether AI workflows can execute safely.
+The runtime health subsystem determines whether AI-assisted workflows can execute safely.
 
-Neovim-AIDE uses a **Stale-While-Revalidate** health model.
+Neovim-AIDE uses a **Stale-While-Revalidate (SWR)** health model.
 
-At startup, the most recently known health state is loaded from persistent cache, allowing Neovim to become immediately usable without blocking startup.
+At startup, the most recently known health state is restored from persistent cache. This allows Neovim to become immediately responsive without performing a blocking health check.
 
-Whenever an AI workflow is invoked, a complete runtime health check is performed before execution proceeds.
+Immediately before an AI-assisted workflow executes, a fresh runtime health check validates the current environment.
 
 Responsibilities include:
 
@@ -207,7 +212,7 @@ Typical states include:
 
 ### Operational State
 
-Operational state reflects the current workflow lifecycle.
+Operational state reflects the active workflow lifecycle.
 
 Typical states include:
 
@@ -217,22 +222,40 @@ Typical states include:
 - Applied
 - Failed
 
-Operational state always takes precedence while a workflow is active, ensuring the user sees the most relevant information.
+During workflow execution, operational state temporarily takes precedence over health state so that the statusline reflects the activity most relevant to the developer.
 
 ---
 
 ## AI Execution
 
-The AI execution subsystem delegates model interaction to the configured AI provider.
+The AI execution subsystem delegates model interaction to **Codex CLI**, the execution backend shipped with the current release.
 
-The remainder of the system is insulated from provider-specific implementation details, allowing execution behaviour to evolve independently from workflow orchestration.
+Execution is coordinated through focused runtime modules so that provider-specific concerns remain contained as far as the current architecture permits. A formal provider and model abstraction is reserved for a future release.
 
 Responsibilities include:
 
 - process execution
 - asynchronous communication
 - response collection
-- execution abstraction
+- Codex CLI integration
+
+---
+
+## Streaming Output
+
+Streaming output provides continuous feedback while AI-assisted operations execute.
+
+Rather than waiting for a complete response, Neovim-AIDE streams execution progress as it becomes available.
+
+Responsibilities include:
+
+- stdout streaming
+- stderr streaming
+- incremental status updates
+- latency timing
+- output capture
+
+Streaming improves perceived responsiveness while preserving complete operational visibility.
 
 ---
 
@@ -240,7 +263,7 @@ Responsibilities include:
 
 Report windows provide consistent operational feedback throughout workflow execution.
 
-Rather than exposing raw command output, Neovim-AIDE presents structured reports that explain the current operation, its outcome and any required user action.
+Rather than exposing raw command output, Neovim-AIDE presents structured reports that explain the current operation, its outcome and any required developer action.
 
 Examples include:
 
@@ -277,7 +300,7 @@ Depending on the workflow, validation may include:
 - constrained refactoring
 - language-aware analysis
 
-Validation exists to reduce incorrect or unsafe modifications before they reach the user's project.
+Validation exists to reduce incorrect or unsafe modifications before they reach the developer's project.
 
 ---
 
@@ -285,7 +308,7 @@ Validation exists to reduce incorrect or unsafe modifications before they reach 
 
 The apply subsystem performs controlled modification of project files.
 
-Changes are applied only after successful completion of the workflow lifecycle and explicit user confirmation.
+Changes are applied only after successful completion of the workflow lifecycle and explicit developer confirmation.
 
 The architecture intentionally avoids autonomous source-code modification.
 
@@ -293,17 +316,19 @@ The architecture intentionally avoids autonomous source-code modification.
 
 ## Observability
 
-Operational observability is treated as part of the system architecture rather than an implementation detail.
+Operational observability is treated as a core architectural capability rather than an implementation detail.
 
 Responsibilities include:
 
 - structured logging
-- latency instrumentation
-- workflow tracing
+- workflow state
+- latency tracking
+- prompt version visibility
+- recovery reporting
 - diagnostics
 - operational metrics
 
-These capabilities support debugging, troubleshooting and performance analysis.
+These capabilities support debugging, troubleshooting and performance analysis while giving developers confidence in every AI-assisted workflow.
 
 ---
 
@@ -347,24 +372,15 @@ The repository broadly mirrors the architectural organisation of the runtime.
 bootstrap.sh
 
 lua/
-    aide/
-        workflow.lua
-        runner.lua
-        health.lua
-        state.lua
-        preview.lua
-        prompt.lua
-        validation.lua
-        report.lua
-        cli.lua
-        log.lua
+    <runtime configuration and focused Codex modules>
 
 docs/
 tests/
 demo/
+tools/
 ```
 
-Each major runtime subsystem is implemented as a focused module with a single primary responsibility.
+The runtime is divided into focused modules covering workflow coordination, execution, health, prompts, state, preview, validation, reporting, logging and related operational concerns.
 
 This alignment between architecture and implementation helps contributors navigate the codebase while reducing architectural drift over time.
 
@@ -372,16 +388,17 @@ This alignment between architecture and implementation helps contributors naviga
 
 # Safety Model
 
-Neovim-AIDE is intentionally designed to favour explicit engineering workflows over autonomous behaviour.
+Neovim-AIDE is intentionally designed to favour explicit development workflows over autonomous behaviour.
 
 Safety mechanisms include:
 
 - runtime health validation
 - preview-before-apply
 - validation-before-apply
-- explicit user confirmation
+- explicit developer confirmation
 - structured operational logging
 - observable workflow state
+- sandbox-first validation
 
 The architecture assumes:
 
@@ -406,9 +423,9 @@ The architecture deliberately favours explicit interaction over hidden automatio
 
 # Summary
 
-Neovim-AIDE is an AI-Assisted IDE built around structured workflows, runtime validation and explicit developer control.
+Neovim-AIDE is an AI-assisted IDE built around predictable workflows, runtime validation and explicit developer control.
 
-Its architecture combines workflow orchestration, runtime health validation, operational visibility and user approval into a coherent engineering model.
+Its architecture combines workflow orchestration, runtime health validation, streaming execution, operational visibility and explicit developer approval into a coherent development model.
 
 The guiding principles remain unchanged:
 
@@ -417,3 +434,4 @@ The guiding principles remain unchanged:
 - Traceability
 
 **Human-controlled. AI-assisted.**
+

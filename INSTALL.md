@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE.
+> A Neovim IDE
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -11,9 +11,9 @@
 
 # Installing Neovim-AIDE
 
-This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation. It installs and configures an entirely new and self-contained IDE based on Neovim and OpenAI's Codex CLI.
+This guide explains how to install, bootstrap and validate a new Neovim-AIDE installation.
 
-The objective is to provide a reproducible installation experience for first-time users while establishing a reliable foundation for AI-assisted software development.
+Following this guide establishes a reproducible, self-contained AI-assisted development environment built on Neovim and OpenAI's Codex CLI.
 
 ---
 
@@ -25,11 +25,7 @@ The objective is to provide a reproducible installation experience for first-tim
 | Linux    | Experimental |
 | Windows  | Unsupported  |
 
-Neovim-AIDE is developed and validated on:
-
-- macOS
-- Apple Silicon
-- XDG-compliant Neovim installations
+Neovim-AIDE is currently developed and validated on macOS Apple Silicon using XDG-compliant Neovim installations.
 
 Linux support is actively improving but should currently be regarded as experimental.
 
@@ -68,14 +64,7 @@ Clone Neovim-AIDE into your Neovim configuration directory.
 
 ```bash
 git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
-```
-
----
-
-## Make the Bootstrap Script Executable
-
-```bash
-chmod +x ./scripts/bootstrap.sh
+cd ~/.config/nvim
 ```
 
 ---
@@ -84,7 +73,7 @@ chmod +x ./scripts/bootstrap.sh
 
 The bootstrap script validates the installation and prepares the runtime environment.
 
-It verifies:
+The bootstrap script verifies:
 
 - supported platform
 - required dependencies
@@ -153,7 +142,7 @@ For example:
 nvim hello.c
 ```
 
-Select some code in Visual mode and execute an AI-assisted workflow.
+Visually select some source code in Visual mode and execute an AI-assisted workflow.
 
 Example:
 
@@ -177,11 +166,10 @@ A typical upgrade workflow is:
 
 ```bash
 git pull
-
 ./scripts/bootstrap.sh --sync
 ```
 
-After updating, verify the installation inside Neovim:
+After synchronising, verify the installation inside Neovim:
 
 ```vim
 :CodexHealth
@@ -212,7 +200,7 @@ Configuration belongs in:
 
 Runtime-generated data should remain in the appropriate XDG runtime directories.
 
-The bootstrap process validates this separation automatically.
+The bootstrap script validates this separation automatically.
 
 ---
 
@@ -237,6 +225,18 @@ This information can be useful when troubleshooting installation or runtime issu
 ---
 
 # Troubleshooting
+
+## Missing Plugins
+
+Synchronise plugins again:
+
+```bash
+./scripts/bootstrap.sh --sync
+```
+
+The bootstrap script will ensure that required plugins are installed.
+
+---
 
 ## Codex CLI Not Found
 
@@ -274,32 +274,19 @@ Runtime-generated files should not exist inside:
 ~/.config/nvim
 ```
 
-The bootstrap process reports any runtime hygiene issues that require attention.
-
----
-
-## Missing Plugins
-
-Synchronise plugins again:
-
-```bash
-./scripts/bootstrap.sh --sync
-```
-
-The bootstrap process will ensure that required plugins are installed.
+The bootstrap script reports any runtime hygiene issues that require attention.
 
 ---
 
 # Related Documentation
 
-| Document                      | Purpose                          |
-| ----------------------------- | -------------------------------- |
-| `README.md`                   | Product overview and quick start |
-| `docs/README.md`              | Documentation index              |
-| `docs/ARCHITECTURE.md`        | System architecture              |
-| `docs/CONTRIBUTING.md`        | Contribution guidelines          |
-| `docs/contributor/README.md`  | Contributor handbook             |
-| `docs/contributor/SANDBOX.md` | Sandbox validation workflow      |
+| Document               | Purpose                          |
+| ---------------------- | -------------------------------- |
+| `README.md`            | Product overview and quick start |
+| `docs/README.md`       | Documentation index              |
+| `docs/COMMANDS.md`     | Commands and developer workflows |
+| `docs/ARCHITECTURE.md` | System architecture              |
+| `docs/CONTRIBUTING.md` | Contribution guidelines          |
 
 ---
 
@@ -307,4 +294,4 @@ The bootstrap process will ensure that required plugins are installed.
 
 Neovim-AIDE is designed to provide a reproducible, observable and maintainable AI-assisted software development environment.
 
-Following the installation and bootstrap process described in this guide establishes a clean, validated foundation for AI-assisted software development while preserving the project's guiding principles of correctness, control and traceability.
+Following this guide establishes a clean, validated foundation for AI-assisted software development while preserving Neovim-AIDE's guiding principles of Correctness, Control and Traceability.

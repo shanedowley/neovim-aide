@@ -170,36 +170,16 @@ return {
 				----------------------------------------------------------------------
 				{ "<leader>c", group = "+codex", mode = { "n", "x" } },
 
-				-- Normal mode Codex actions
-				{ "<leader>cc", desc = "Toggle Codex context injection", mode = "n" },
-				{ "<leader>cC", desc = "Show Codex project context", mode = "n" },
-				{ "<leader>cE", desc = "Explain current line", mode = "n" },
-				{ "<leader>cR", desc = "Refactor current function", mode = "n" },
-				{ "<leader>cP", desc = "Safe refactor preview (current function)", mode = "n" },
-				{ "<leader>cD", desc = "Preview diff (current line)", mode = "n" },
-				{ "<leader>cL", desc = "Open Codex log", mode = "n" },
-				{ "<leader>cH", desc = "Codex health check", mode = "n" },
-				{ "<leader>cl", desc = "Run on current line", mode = "n" },
-				{ "<leader>cF", desc = "Run on entire file", mode = "n" },
-				{ "<leader>cp", desc = "Patch buffer (diff)", mode = "n" },
-				{ "<leader>cs", desc = "Scratchpad prompt", mode = "n" },
-				{ "<leader>cS", desc = "Show Codex workflow state", mode = "n" },
-				{ "<leader>cT", desc = "Show Codex latency report", mode = "n" },
-				{ "<leader>cV", desc = "Show Codex prompt version info", mode = "n" },
-				{ "<leader>cX", desc = "Show Codex recovery report", mode = "n" },
-				{ "<leader>c,", desc = "Show last Codex operation", mode = "n" },
-				{ "<leader>c.", desc = "Repeat last Codex prompt", mode = "n" },
-
-				-- Visual mode Codex actions
-				{ "<leader>ce", desc = "Fast explain selection", mode = "x" },
-				{ "<leader>cE", desc = "Rigorous explain selection", mode = "x" },
-				{ "<leader>cr", desc = "Replace selection", mode = "x" },
-				{ "<leader>co", desc = "Open output scratch", mode = "x" },
-				{ "<leader>ca", desc = "Apply inline", mode = "x" },
-				{ "<leader>cd", desc = "Preview diff", mode = "x" },
-				{ "<leader>cP", desc = "Safe refactor preview selection", mode = "x" },
-				{ "<leader>cw", desc = "Write output to file", mode = "x" },
-				{ "<leader>cs", desc = "Scratchpad prompt", mode = "x" },
+				----------------------------------------------------------------------
+				-- NAVIGATION
+				----------------------------------------------------------------------
+				{ "<leader>n", group = "+navigation", mode = "n" },
+				{ "<leader>nh", desc = "Function start", mode = "n" },
+				{ "<leader>nj", desc = "Next function", mode = "n" },
+				{ "<leader>nk", desc = "Previous function", mode = "n" },
+				{ "<leader>nl", desc = "Function end", mode = "n" },
+				{ "<leader>nt", desc = "Next code marker", mode = "n" },
+				{ "<leader>nT", desc = "Previous code marker", mode = "n" },
 
 				----------------------------------------------------------------------
 				-- LSP

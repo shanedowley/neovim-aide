@@ -5,9 +5,11 @@ local CONFIG_PROMPT_DIR = vim.fn.expand("~/.config/nvim/codex/prompts")
 
 local DEFAULTS = {
 	explain_c = [[
-Explain the following C/C++ snippet for a developer who wants to understand it quickly.
+Explain {{subject}} for a developer who wants to understand it quickly.
 
 Output format:
+- Structure the explanation with clear Markdown headings and short sections where appropriate.
+
 ## What this does
 - 2–4 bullets explaining the purpose and flow.
 
@@ -33,15 +35,19 @@ Rules:
 ]],
 
 	explain_generic = [[
-Explain the following {{filetype}} snippet step-by-step.
+Explain {{subject}} step-by-step.
 
 Rules:
-- First, echo the snippet exactly as you received it in a fenced block labeled: ```received ... ```.
-- Be strictly accurate about the language semantics and runtime behavior. If unsure, say so explicitly.
-- Focus on what THIS snippet does and why (control flow, data flow, key language features used).
-- Call out likely errors, edge cases, and surprising behavior, but don’t invent context not present.
+- Be accurate about its semantics, structure, and meaning. If unsure, say so explicitly.
+- Focus on what this content does or communicates and why.
+- For source code, explain control flow, data flow, and important language features.
+- For documentation, explain purpose, structure, and key ideas.
+- For configuration or structured data, explain important keys, values, and relationships.
+- Call out likely errors, edge cases, ambiguities, or surprising behaviour only when directly relevant.
+- Do not invent context that is not present.
+- Structure the explanation with clear Markdown headings where appropriate; prefer short sections over one undifferentiated bullet list.
 - Keep it concise: maximum 12 bullets.
-- Do NOT rewrite the code unless I ask.
+- Do not rewrite the content unless explicitly asked.
 ]],
 
 	apply = [[

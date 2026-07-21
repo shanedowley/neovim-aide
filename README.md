@@ -1,6 +1,6 @@
 # Neovim-AIDE
 
-> A Neovim IDE.
+> A Neovim IDE
 > Human-controlled. AI-assisted.
 
 ## AI Engine
@@ -9,111 +9,136 @@
 
 ---
 
-## What is Neovim-AIDE?
+# What is Neovim-AIDE?
 
-Neovim-AIDE is a Neovim IDE for AI-assisted software development. It combines coding, debugging, validation, workflow visibility and Codex-powered assistance inside a human-controlled development environment.
+Neovim-AIDE is an AI-assisted IDE for Neovim.
 
-## Ethos
+It combines AI-assisted software development workflows with runtime validation, operational visibility and explicit developer control, allowing AI to strengthen software development practice without replacing human judgement.
 
-- Neovim-AIDE is an ongoing exploration of how AI can strengthen software development practice without weakening or bypassing human judgement.
+Neovim-AIDE is designed around three core principles:
 
-- The goal is not autonomous coding. The goal is developer confidence.
+- **Correctness**
+- **Control**
+- **Traceability**
 
-- Neovim-AIDE is designed as an AI-assisted IDE rather than a generic AI editor plugin. The AI assists the developer’s judgement; it does not replace it.
+The AI assists.
 
-- Generated output should be reviewable.
+The developer decides.
 
-- All system behaviour should be observable and failures should be recoverable.
+---
 
-- Ultimately the developer remains responsible for all engineering decisions. The system exists to make those decisions safer, clearer, and more informed.
-
-## Latest Release
-
-**Current Release: R1.4**
-
-Neovim-AIDE R1.4 is a focused daily-use workflow release.
-
-Highlights:
-
-- improved DAP watches UX
-- visual-mode safe refactor preview for selected code
-- cleaner Codex which-key workflow descriptions
-- cleaner sandbox startup when `yarn` is missing
-
-Read the full release notes:
-
-- [Neovim-AIDE 1.4 Release Notes](docs/releases/RELEASE_NOTES_R1_4.md)
-
-Neovim-AIDE is designed for users who want AI-assisted workflows that remain:
-
-- correct
-- controllable
-- traceable
-- recoverable
-- reproducible
+# Why Neovim-AIDE Exists
 
 Many AI coding tools optimise for speed and automation.
 
 Neovim-AIDE instead optimises for:
 
-- engineering confidence
+- developer confidence
 - operational safety
-- explicit human review
+- explicit review
 - deterministic workflows
-- inspectable behaviour
+- observable behaviour
+- recoverable failures
 
 The goal is not autonomous coding.
 
 The goal is trustworthy AI-assisted software development.
 
-## Quick Start
+---
 
-Clone the repository into your Neovim configuration directory:
+# Latest Release
+
+**Current Public Release: R1.4**
+
+Neovim-AIDE R1.4 is a focused daily-use workflow release.
+
+Highlights include:
+
+- improved DAP Watches developer experience
+- visual-mode safe refactor preview
+- improved Codex workflow discoverability
+- sandbox startup improvements
+
+Release notes:
+
+- `docs/releases/RELEASE_NOTES_R1_4.md`
+
+Earlier release notes are listed in the Documentation section below.
+
+---
+
+# Developer Flow
+
+Neovim-AIDE is organised around developer workflows rather than isolated AI commands.
+
+Developer workflows include:
+
+- explain the current line, buffer, function or class
+- review the current function or class
+- safely preview refactoring changes
+- perform controlled source-code mutation
+- function and class navigation
+- function and class selection
+- code-marker navigation
+- runtime health validation
+- operational diagnostics
+- failure recovery
+- latency instrumentation
+
+Every workflow follows the same philosophy:
+
+```text
+Request
+    ↓
+Validate
+    ↓
+Execute
+    ↓
+Review
+    ↓
+Approve
+    ↓
+Apply (when applicable)
+```
+
+Read-only workflows stop after review.
+
+Mutation workflows require explicit developer approval.
+
+---
+
+# Quick Start
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
 cd ~/.config/nvim
 ```
 
-Run the bootstrap validation:
+Validate the installation:
 
 ```bash
 ./scripts/bootstrap.sh --check
 ```
 
-Launch Neovim and verify the installation:
+Launch Neovim and verify runtime health:
 
 ```vim
 :CodexHealth
 ```
 
-Open any C or C++ source file, visually select some code, then press:
+Open a source file, visually select some code and run:
 
 ```text
 <leader>cE
 ```
 
-For complete installation and upgrade instructions, see `INSTALL.md`.
+to execute your first explainability workflow.
 
-This project is architected as an AI-integrated IDE rather than a generic AI editor plugin.
+For complete installation instructions see:
 
-## Documentation
-
-The project documentation is organised by audience type:
-
-### Users
-
-Documentation covering installation, configuration and day-to-day use.
-
-### Contributors
-
-Documentation covering engineering workflows, validation practices and project architecture.
-
-Start here:
-
-```text
-docs/README.md
-```
+- `INSTALL.md`
 
 ---
 
@@ -138,259 +163,78 @@ docs/README.md
 - Node.js
 - npm
 
-Node.js and npm are only required for JavaScript-related debugging, testing, and development workflows.
-
-### Notes
-
-- Codex CLI must already be authenticated.
-- Node.js is only required for JavaScript workflows.
+Node.js is only required for JavaScript-related workflows.
 
 ---
 
-## What is an AI-Assisted IDE?
+# Documentation
 
-Neovim-AIDE treats AI as one component within a larger engineering workflow.
+Documentation is organised by purpose.
 
-The development environment combines:
+## Getting Started
 
-- AI-assisted reasoning
-- validation gates
-- operational diagnostics
-- workflow state visibility
-- failure recovery
-- explicit human approval
+- `INSTALL.md`
 
-The result is an engineering system that uses AI while preserving Correctness, Control, and Traceability.
+Installation, bootstrap validation and first-run guidance.
 
-AI is not the workflow. It is one component within the workflow.
+## Commands
 
-Human judgement remains the final authority.
+- `docs/COMMANDS.md`
 
----
+Developer workflows, key mappings and Ex commands.
 
-## Typical Engineering Workflow
+## Architecture
 
-Neovim-AIDE treats AI as one stage within a controlled development workflow rather than the workflow itself.
+- `docs/ARCHITECTURE.md`
 
-```text
-          Source Code
-               │
-               ▼
-        Select Code
-               │
-               ▼
-       Invoke Codex Workflow
-               │
-               ▼
-      Preview Proposed Changes
-               │
-               ▼
-      Validate Generated Output
-               │
-               ▼
-     Explicit Human Approval
-               │
-               ▼
-          Apply Changes
-```
+Runtime architecture, workflow model, health model and operational design.
 
-Every workflow is designed to preserve the three core engineering principles of software development:
+## Contributing
 
-- **Correctness** — generated changes are validated before application.
-- **Control** — no source code is modified without explicit user approval.
-- **Traceability** — operational behaviour is observable, logged, and reviewable.
+- `docs/CONTRIBUTING.md`
 
-AI contributes to the workflow, but it never replaces human judgement.
+Contribution guidelines, project philosophy and sandbox-first validation.
 
----
+## Documentation Index
 
-## Who This Is For
+- `docs/README.md`
 
-Neovim-AIDE is designed for developers who want:
+Complete documentation map.
 
-- explicit control over AI-generated changes
-- reviewable mutation workflows
-- operational observability
-- deterministic systems
-- human-in-the-loop workflows
-- safety over blind automation
+## Release History
 
----
-
-## Release Highlights
-
-This release includes:
-
-- startup without blocking healthchecks
-- Stale-While-Revalidate health validation
-- runtime workflow visibility
-- structured latency instrumentation
-- streaming Codex output
-- improved diagnostics and recovery workflows
-- expanded documentation and operational guidance
-- isolated sandbox validation workflow
+- `docs/releases/RELEASE_NOTES_RC1_0.md`
+- `docs/releases/RELEASE_NOTES_R1_1.md`
+- `docs/releases/RELEASE_NOTES_R1_3.md`
+- `docs/releases/RELEASE_NOTES_R1_4.md`
 
 ---
 
 # Key Features
 
-## Safe Engineering
+## AI-Assisted Development
 
-- Preview before apply
-- Validation gates
-- Explicit approval
+- explainability workflows
+- review workflows
+- controlled refactoring
+- safe mutation
+- prompt versioning
 
-## Observability
+## Operational Confidence
 
-- Telemetry
-- Workflow state
-- Health model
+- runtime health validation
+- workflow state visibility
+- structured logging
+- latency instrumentation
+- failure recovery
 
-## Recovery
+## Developer Experience
 
-- Failure capture
-- Recovery reports
-
-## Contributor Experience
-
-- Streaming AI output
-- Legacy code explainability
-- Interactive engineering workflows
-
----
-
-# Why Neovim-AIDE Exists
-
-Neovim-AIDE was built around a simple premise:
-
-AI-assisted IDEs should increase confidence, not reduce it. The AI should assist software development workflows not bypass them.
-
-The system is intentionally designed to favour:
-
-- preview-before-apply workflows
-- explicit user approval
-- operational observability
-- deterministic execution
-- recoverable failure handling
-- validation before mutation
-
-The developer always remains in control. No silent apply path exists.
-
-To support this, Neovim-AIDE makes workflow state, health state, and operational behaviour visible to the user.
-
----
-
-# Workflow State Model
-
-Operational state transitions are explicit and visible.
-
-## Health States
-
-- ? Unknown
-- 🩺 Healthcheck Running
-- ✓ Ready
-- ✖ Blocked
-
-## Operational States
-
-- ⚙ Running
-- 👁 Preview
-- 🧪 Validating
-- ✅ Applied
-- ✖ Failed
-
-Operational states always take precedence over health states.
-
----
-
-# Startup Behaviour
-
-Neovim-AIDE never performs a blocking healthcheck during startup.
-
-Startup remains immediately usable.
-
-Health validation occurs only at point-of-use when a Codex workflow is executed.
-
----
-
-# Runtime Health Model
-
-Neovim-AIDE uses a Stale-While-Revalidate health model.
-
-What this means:
-
-- startup uses the most recently known health state
-- startup never performs a blocking healthcheck
-- Neovim remains immediately usable
-- a real healthcheck runs only when a Codex workflow is invoked
-
-For example:
-
-1. Yesterday, Codex was known to be healthy.
-2. Neovim starts today.
-3. The last known state is displayed immediately.
-4. No startup delay occurs.
-5. When the user runs a Codex workflow, the system performs a real healthcheck before execution.
-
-This approach preserves responsiveness without sacrificing safety.
-
-The user never waits for a healthcheck during startup, but Codex still refuses execution if runtime validation fails.
-
-This is the rationale behind the term:
-
-```text
-Stale
-=
-Last known health state
-
-While
-
-Revalidate
-=
-Perform a real healthcheck only at point-of-use
-```
-
-This design eliminates startup delays while preserving the correctness guarantees of the execution gate.
-
----
-
-# Runtime Status
-
-Neovim-AIDE exposes both health state and workflow state to the user.
-
-Examples:
-
-```text
-? Codex Unknown
-🩺 Codex Healthcheck Running
-⚙ Codex Running
-✓ Codex Ready
-✖ Codex Blocked
-```
-
-Operational states automatically take precedence over health states.
-
-This visibility is intentional and forms part of the system's observability model.
-
----
-
-# Core Principles
-
-## Correctness
-
-Generated changes should validate before apply.
-
-## Control
-
-The user remains in control of all changes.
-
-## Traceability
-
-Operational events are logged and inspectable.
-
-## Recoverability
-
-Failures are treated as operational events rather than hidden behaviour.
+- function and class navigation
+- code-marker navigation
+- DAP integration
+- sandbox-first validation
+- integrated diagnostics
 
 ---
 
@@ -402,362 +246,44 @@ Failures are treated as operational events rather than hidden behaviour.
 | Linux    | Experimental |
 | Windows  | Unsupported  |
 
-Neovim-AIDE is currently developed and tested on macOS Apple Silicon.
-
-Linux support is an active future direction.
-
-Windows support is planned as part of a future cross-platform strategy.
-
----
-
-# First Run Walkthrough
-
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/shanedowley/neovim-aide.git ~/.config/nvim
-cd ~/.config/nvim
-```
-
-## 2. Run Bootstrap Validation
-
-Fast validation:
-
-```bash
-./scripts/bootstrap.sh --check
-```
-
-Full sync:
-
-```bash
-./scripts/bootstrap.sh --sync
-```
-
-Health gate integrity test:
-
-```bash
-./scripts/bootstrap.sh --test-health-gate
-```
-
-## 3. Launch Neovim
-
-```bash
-nvim
-```
-
-## 4. Observe Startup Behaviour
-
-Immediately after launch, the statusline will display:
-
-```text
-? Codex Unknown
-```
-
-This is expected.
-
-Neovim-AIDE uses a Stale-While-Revalidate health model.
-
-No real healthcheck is performed during startup.
-
-## 5. Verify Runtime Health
-
-Inside Neovim:
-
-```text
-:CodexHealth
-```
-
-Review the diagnostic report and confirm all required checks pass.
-
-## 6. Execute Your First Workflow
-
-Open a C or C++ source file.
-
-Visually select a block of code.
-
-Run:
-
-```text
-<leader>cE
-```
-
-Neovim-AIDE will:
-
-1. validate runtime health
-2. transition through workflow states
-3. execute the explainability workflow
-4. stream explanation output into a scratch buffer
-
-Expected state progression:
-
-```text
-🩺 Codex Healthcheck Running
-⚙ Codex Running
-✓ Codex Ready
-```
-
-You have now successfully executed your first AI-assisted workflow.
-
----
-
-# Documentation
-
-## Getting Started
-
-- `INSTALL.md` — installation, bootstrap, and first-run setup
-
-## Architecture
-
-- `docs/ARCHITECTURE.md` — architectural principles, workflow model, health model, state model, and operational design
-
-## Contributing
-
-- `docs/CONTRIBUTING.md` — contribution guidelines
-
-## Release Documentation
-
-- `docs/releases/RELEASE_NOTES_RC1_0.md` — historical Release Candidate 1.0 notes
-- `docs/releases/RELEASE_NOTES_R1_1.md` — historical Release 1.1 notes
-
-## In-Editor Help
-
-- `:CodexCommands`
-- `:CodexHealth`
-- `:CodexState`
-
----
-
-# Engineering Workflows
-
-Neovim-AIDE is organised around software development workflows rather than isolated commands.
-
-Each workflow is designed to support Correctness, Control, and Traceability throughout the software development lifecycle.
-
-## D1 — Safe Refactor Workflow
-
-Demonstrates:
-
-- AI-assisted code modification
-- preview-before-apply review
-- explicit user approval
-- validation before mutation
-- controlled source-code changes
-
-This workflow demonstrates the core AI-assisted engineering principle that generated changes should be reviewed and validated before they are applied.
-
-![D1 Safe Refactor Workflow](docs/assets/demos/d1-safe-refactor.gif)
-
-See:
-
-- `docs/demos/D1_SAFE_REFACTOR.md`
-
----
-
-## D2 — Failure Recovery and Explainability
-
-Demonstrates:
-
-- validation rejection
-- protected active buffers
-- recovery capture
-- failure diagnostics
-- AI-assisted failure explanation
-
-Failures are treated as operational events rather than hidden behaviour.
-
-The system captures failure context and provides structured recovery information to help users understand what happened and how to proceed.
-
-![D2 Failure Recovery Workflow](docs/assets/demos/d2-failure-recovery.gif)
-
-See:
-
-- `docs/demos/D2_FAILURE_RECOVERY.md`
-
----
-
-## D3 — Operational Diagnostics
-
-Demonstrates:
-
-- runtime health validation
-- workflow state visibility
-- latency telemetry
-- structured logging
-- operational observability
-- health cache behaviour
-
-This workflow highlights one of the defining characteristics of Neovim-AIDE:
-
-System behaviour remains visible and inspectable.
-
-Operational state is treated as a first-class concern rather than hidden implementation detail.
-
-![D3 Operational Diagnostics](docs/assets/demos/d3-operational-diagnostics.gif)
-
-See:
-
-- `docs/demos/D3_OPERATIONAL_DIAGNOSTICS.md`
-
----
-
-## D4 — Legacy Code Explainability
-
-Demonstrates:
-
-- AI-assisted code understanding
-- legacy system exploration
-- non-destructive analysis
-- explainability workflows
-- knowledge transfer
-
-This workflow allows users to understand unfamiliar codebases without modifying source code.
-
-It is particularly useful when working with legacy systems, inherited code, or large existing projects.
-
-![D4 Legacy Code Explainability](docs/assets/demos/d4-legacy-explainability.gif)
-
-See:
-
-- `docs/demos/D4_LEGACY_EXPLAINABILITY.md`
-
----
-
-## D5 — Human-in-the-Loop Engineering
-
-Demonstrates:
-
-- iterative refinement
-- review and feedback
-- explicit approval
-- controlled automation
-- human decision-making
-
-Neovim-AIDE is intentionally designed around a human-in-the-loop model.
-
-The AI may generate suggestions, but responsibility for engineering decisions remains with the user.
-
-![D5 Human-in-the-Loop Engineering](docs/assets/demos/d5-human-loop.gif)
-
-See:
-
-- `docs/demos/D5_HUMAN_LOOP.md`
-
----
-
-# Core Workflows & Commands
-
-## Explainability
-
-Understand code before changing it.
-
-- `<leader>cE`
-- `:CodexExplainFailure`
-
-## Refactoring
-
-Generate candidate improvements safely.
-
-- `<leader>ce`
-- `<leader>cR`
-
-## Review
-
-Inspect generated changes before approval.
-
-- `<leader>cd`
-- `<leader>cD`
-
-## Diagnostics
-
-Understand system health and operational behaviour.
-
-- `:CodexHealth`
-- `:CodexState`
-- `:CodexLatency`
-- `:CodexCommands`
-
-## Recovery
-
-Treat failures as inspectable engineering events.
-
-- `:CodexRecovery`
-- `:CodexExplainFailure`
+Neovim-AIDE is currently developed and validated on macOS Apple Silicon.
 
 ---
 
 # Roadmap
 
-## Platform Expansion
+Near-term development focuses on:
 
-- Linux hardening
-- Windows / WSL support
-- platform abstraction layer
-- reproducible installation workflows
+- continued developer workflow improvements
+- platform hardening
+- documentation quality
+- operational observability
 
-## Workflow Expansion
-
-- multi-language support
-- enhanced explainability workflows
-- advanced recovery tooling
-- richer validation pipelines
-- workflow automation under explicit user control
-
-## AI Platform Integration
-
-- OpenRouter integration
-- OpenCode integration exploration
-- additional model provider support
-
-## Observability and Operations
-
-- telemetry standardisation
-- workflow analytics
-- health monitoring enhancements
-- operational reporting improvements
-
-## Productisation
-
-- standalone plugin extraction
-- installation simplification
-- documentation expansion
-- release automation
-- cross-platform release engineering
+Future major releases will introduce provider abstraction and support for multiple AI model providers while preserving the existing human-controlled workflow model.
 
 ---
 
 # Acknowledgements
 
-Neovim-AIDE exists because of the incredible work of those who built the tools, ideas, and engineering traditions upon which it stands.
+Neovim-AIDE exists because of the remarkable work of those who shaped modern programmable editors.
 
 With gratitude to:
 
 - Tim Thompson, creator of Stevie
 - Bram Moolenaar, creator of Vim
 
-The lineage from vi to Stevie, to Vim and Neovim establish many of the editing philosophies that continue to influence Neovim-AIDE today:
-
-- composability
-- inspectability
-- user control
-- engineering craftsmanship
-
-Neovim-AIDE is built in that tradition.
+Their emphasis on composability, transparency and developer control continues to influence Neovim-AIDE today.
 
 ---
 
-# Closing Notes
+# Closing
 
-Neovim-AIDE represents a deliberate attempt to build AI-assisted software development workflows that remain:
+Neovim-AIDE is an AI-assisted IDE built around explicit developer workflows rather than autonomous automation.
 
-- observable
-- reviewable
-- deterministic
-- recoverable
-- traceable
-- user-controlled
-
-This AI-assisted IDE is built around three core principles:
+Its guiding principles remain unchanged:
 
 - Correctness
 - Control
 - Traceability
+
+**Human-controlled. AI-assisted.**
