@@ -48,20 +48,21 @@ The goal is trustworthy AI-assisted software development.
 
 # Latest Release
 
-**Current Public Release: R1.4**
+**Current Public Release: R1.5**
 
-Neovim-AIDE R1.4 is a focused daily-use workflow release.
+Neovim-AIDE R1.5 is a focused Developer Flow release.
 
 Highlights include:
 
-- improved DAP Watches developer experience
-- visual-mode safe refactor preview
-- improved Codex workflow discoverability
-- sandbox startup improvements
+- Explain Current Buffer
+- Explain Current Function and Class
+- Review Current Function and Class
+- Improved developer navigation
+- Documentation refresh
 
 Release notes:
 
-- `docs/releases/RELEASE_NOTES_R1_4.md`
+- `docs/releases/RELEASE_NOTES_R1_5.md`
 
 Earlier release notes are listed in the Documentation section below.
 
