@@ -232,6 +232,32 @@ function M.build_explain_fast(ft, scope)
 	return with_header(body)
 end
 
+function M.build_review(ft, scope)
+	ft = ft or ""
+	scope = scope or "selection"
+
+	local body = table.concat({
+		"Review " .. explain_subject(ft, scope) .. ".",
+		"",
+		"Focus on:",
+		"- correctness",
+		"- readability",
+		"- maintainability",
+		"- robustness",
+		"- potential bugs",
+		"- opportunities for simplification",
+		"",
+		"Do not rewrite the code.",
+		"Do not produce a patch.",
+		"Provide a concise developer review.",
+	}, "\n")
+
+	local base = with_header(body)
+	local profile = mode.get()
+
+	return base .. (profile.explain_suffix or "")
+end
+
 function M.build_apply(user_instruction, selected_text)
 	local template = store.get("apply")
 	local rendered = substitute(template, {

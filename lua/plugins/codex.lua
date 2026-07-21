@@ -251,6 +251,13 @@ return {
 				desc = "Show Codex latency report",
 			},
 			{
+				"<leader>cu",
+				function()
+					require("codex_cli").review_current_function()
+				end,
+				desc = "Review current function",
+			},
+			{
 				"<leader>cV",
 				function()
 					require("codex_cli").show_prompt_version()

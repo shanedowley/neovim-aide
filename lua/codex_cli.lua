@@ -948,6 +948,62 @@ function M.explain_selection_fast()
 	end)
 end
 
+function M.review_current_function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local text = navigation.current_function_text()
+
+	if not text or vim.trim(text) == "" then
+		return
+	end
+
+	local ft = vim.bo[bufnr].filetype or ""
+	local op_name = "review_current_function"
+
+	local user_prompt = table.concat({
+		prompt.build_review(ft, "selection"),
+		"",
+		"Context:",
+		"- The supplied input is the complete enclosing function at the cursor.",
+		"- Review it as production-quality code.",
+		"- Focus on correctness, readability, maintainability, robustness, and potential defects.",
+		"- Do not rewrite the code.",
+		"- Do not produce a patch.",
+	}, "\n")
+
+	remember_and_log_op(op_name, user_prompt)
+
+	runner.run_embedded(text, user_prompt, {
+		op = op_name,
+		filetype = ft,
+		spinner_message = ui.phase_message(op_name, "running"),
+
+		on_success = function(result)
+			local body = parse.prefer_clean_answer(result.output)
+			body = selection.collapse_if_doubled(body, nil)
+
+			set_state_complete(op_name, bufnr, "Function review opened")
+			open_scratch(body, nil, "Codex Function Review")
+		end,
+
+		on_failure = function(result)
+			set_state_failed(op_name, bufnr, "Codex execution failed")
+
+			if #result.stderr > 0 then
+				recovery.show_failure({
+					kind = "codex_exec_failed",
+					stage = "codex_exec",
+					op = op_name,
+					mode = mode.current(),
+					file = current_file(bufnr),
+					reason = "Codex execution failed",
+					title = "Codex STDERR",
+					lines = result.stderr,
+				})
+			end
+		end,
+	})
+end
+
 function M.apply_inline_current_line()
 	local line = vim.fn.getline(".")
 	local lnum = vim.fn.line(".")
