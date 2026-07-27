@@ -163,18 +163,12 @@ Where uncertainty exists:
 
 ---
 
-# Story-Based Development
+# Development Practice
 
-Development proceeds through small stories.
+Implementation follows `DEVELOPMENT_GUIDE.md`.
 
-Each story should have:
-
-- clear objective
-- limited scope
-- defined completion
-- independent validation
-
-Stories should be completed before beginning the next story.
+Work should remain small, focused, independently reviewable and independently
+validatable.
 
 ---
 
@@ -182,13 +176,8 @@ Stories should be completed before beginning the next story.
 
 Meaningful implementation should be validated before being considered complete.
 
-Validation should provide confidence without introducing unnecessary complexity.
-
-Where practical:
-
-- validate in the sandbox
-- review the implementation
-- confirm documentation remains accurate
+`DEVELOPMENT_GUIDE.md` owns general validation practice.
+`SANDBOX_GUIDE.md` owns sandbox validation and safety procedures.
 
 ---
 
@@ -233,20 +222,8 @@ The model should remain simple, understandable and effective.
 
 # Closing Principle
 
-The objective is not to maximise AI involvement.
+The objective is not to maximise AI involvement. The objective is to maximise
+software quality.
 
-The objective is to maximise software quality.
-
-AI is valuable because it helps developers build better software.
-
-Developers remain responsible for building it.
-
-The best software emerges when each participant focuses on what they do best.
-
-Developers provide judgement.
-
-Strategic AI provides thinking.
-
-Implementation AI provides execution.
-
-Together they produce software that is more robust than any one participant working alone.
+Developers provide judgement. Strategic AI provides thinking. Implementation
+AI provides execution.

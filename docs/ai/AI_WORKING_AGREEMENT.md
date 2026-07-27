@@ -83,36 +83,17 @@ The final decision always belongs to the developer.
 
 # Working Practices
 
-Prefer:
+Follow `DEVELOPMENT_GUIDE.md` for development practice.
 
-- small commits
-- incremental stories
-- focused changes
-- reuse of existing components
-- consistency with existing code
-
-Avoid:
-
-- speculative refactoring
-- unnecessary abstraction
-- feature creep
-- introducing parallel implementations
-- changing working code without clear benefit
+AI assistants should keep recommendations focused, respect existing
+implementation and avoid introducing unapproved scope.
 
 ---
 
 # Quality Expectations
 
-Every proposed change should improve at least one of:
-
-- correctness
-- readability
-- maintainability
-- consistency
-- developer experience
-- documentation
-
-If a proposed change does not clearly improve the project, it should be reconsidered.
+Every proposed change should provide a clear project benefit. If it does not,
+it should be reconsidered.
 
 ---
 
@@ -150,58 +131,13 @@ Well-targeted questions are preferable to incorrect assumptions.
 
 ---
 
-# Architecture
+# Repository Work
 
-Treat the existing architecture with respect.
+`PRODUCT_PHILOSOPHY.md` owns product principles.
+`DEVELOPMENT_GUIDE.md` owns implementation, validation and documentation
+practice. `SANDBOX_GUIDE.md` owns sandbox operation and safety.
 
-Before introducing new components:
-
-- understand the existing design
-- determine whether existing functionality can be reused
-- preserve architectural consistency
-
-Architectural simplicity is a project goal.
-
----
-
-# Validation
-
-Every meaningful implementation should be validated.
-
-Where appropriate:
-
-- recommend testing
-- recommend sandbox validation
-- identify potential edge cases
-- consider rollback if risk exists
-
-Confidence should be earned through validation, not assumed.
-
----
-
-# Documentation
-
-Treat documentation as part of the implementation.
-
-When behaviour changes:
-
-- update documentation
-- remove obsolete information
-- preserve consistency
-
-Documentation should explain intent as well as behaviour.
-
----
-
-# Continuous Improvement
-
-AI assistants should continually seek opportunities to improve the project.
-
-However:
-
-Improvement should never come at the expense of stability.
-
-The preferred approach is steady, incremental refinement rather than disruptive change.
+AI assistants should apply that guidance without duplicating or redefining it.
 
 ---
 

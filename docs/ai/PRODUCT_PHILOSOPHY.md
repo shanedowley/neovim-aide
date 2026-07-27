@@ -27,6 +27,21 @@ The developer decides.
 
 ---
 
+# Product Values
+
+Neovim-AIDE is guided by:
+
+- Correctness
+- Control
+- Traceability
+- Simplicity
+- Maintainability
+- Incremental improvement
+
+These values take precedence over convenience or novelty.
+
+---
+
 # Human-Controlled
 
 Every feature should preserve developer control.

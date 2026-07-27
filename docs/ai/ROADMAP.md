@@ -29,17 +29,11 @@ The principles guiding the project should remain considerably more stable.
 
 # Long-Term Vision
 
-Neovim-AIDE aims to become a mature AI-assisted development environment for Neovim.
+Neovim-AIDE aims to become a mature AI-assisted development environment for
+Neovim.
 
-The project will continue to evolve through focused, incremental releases while preserving its core values:
-
-- Correctness
-- Control
-- Traceability
-- Simplicity
-- Maintainability
-
-New capabilities should strengthen these values rather than compromise them.
+The project will continue to evolve while preserving the values and principles
+defined in `PRODUCT_PHILOSOPHY.md`.
 
 ---
 
@@ -81,43 +75,13 @@ Future capabilities should remain consistent with the project's philosophy of hu
 
 ---
 
-# Roadmap Principles
+# Roadmap Constraints
 
-The roadmap follows several guiding principles.
+Roadmap decisions follow `PRODUCT_PHILOSOPHY.md` and
+`DEVELOPMENT_GUIDE.md`.
 
-## Incremental Evolution
-
-Prefer continuous improvement over disruptive redesign.
-
----
-
-## Focused Releases
-
-Each release should have a single, clearly defined objective.
-
-Avoid combining unrelated initiatives.
-
----
-
-## Architectural Continuity
-
-Future work should build upon the existing architecture wherever practical.
-
-Avoid unnecessary redesign.
-
----
-
-## Quality Before Quantity
-
-Deliver fewer features well rather than many features inconsistently.
-
----
-
-## Product Before Technology
-
-Technology choices should serve the product.
-
-The product should not be driven by technology trends.
+Each roadmap initiative should have a focused objective. Technology choices
+should serve product needs rather than technology trends.
 
 ---
 

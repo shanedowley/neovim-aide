@@ -112,9 +112,9 @@ Each release should have:
 
 # Sandbox
 
-An isolated development environment used for validation before applying changes to the primary development environment.
+An isolated Neovim configuration and runtime used to validate changes safely.
 
-Sandbox-first validation is an important development practice within the project.
+`SANDBOX_GUIDE.md` is the canonical reference for sandbox architecture, lifecycle and operation.
 
 ---
 

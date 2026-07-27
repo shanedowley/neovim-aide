@@ -15,11 +15,11 @@
 
 # Purpose
 
-The AI Context Pack captures the intent behind the code.
+The AI Context Pack captures project intent, responsibilities, development
+practice and operating guidance.
 
-The source code explains **how** Neovim-AIDE works.
-
-These documents explain **why** it works this way.
+Source code explains the implementation. These documents explain why the
+project works this way and how contributors should work with it.
 
 Together they provide AI assistants with the context needed to collaborate effectively while respecting the project's architecture, philosophy and development practices.
 
@@ -46,14 +46,38 @@ The AI Context Pack follows the same principles as the rest of Neovim-AIDE.
 AI assistants should read these documents in the following order.
 
 1. **README.md** _(this document)_
-2. **PROJECT_CONTEXT.md**
-3. **PRODUCT_PHILOSOPHY.md**
-4. **DEVELOPMENT_GUIDE.md**
-5. **AI_WORKING_AGREEMENT.md**
-6. **ROADMAP.md**
-7. **GLOSSARY.md**
+2. **AI_DEVELOPMENT_MODEL.md**
+3. **CODEX_ROLE.md**
+4. **PROJECT_CONTEXT.md**
+5. **PRODUCT_PHILOSOPHY.md**
+6. **DEVELOPMENT_GUIDE.md**
+7. **AI_WORKING_AGREEMENT.md**
+8. **SANDBOX_GUIDE.md**
+9. **ROADMAP.md**
+10. **PROJECT_TERMINOLOGY.md**
 
 Each document has a distinct purpose. Together they provide a complete understanding of the project's direction, expectations and development practices.
+
+---
+
+# Document Ownership
+
+Each subject has one canonical owner.
+
+| Document | Canonical responsibility |
+| --- | --- |
+| **README.md** | Context Pack index, scope and authority |
+| **AI_DEVELOPMENT_MODEL.md** | Team roles and the collaboration model |
+| **CODEX_ROLE.md** | Codex-specific repository responsibilities and boundaries |
+| **PROJECT_CONTEXT.md** | Concise project onboarding overview |
+| **PRODUCT_PHILOSOPHY.md** | Enduring product values and principles |
+| **DEVELOPMENT_GUIDE.md** | Development practices and quality expectations |
+| **AI_WORKING_AGREEMENT.md** | AI communication and decision-support behaviour |
+| **SANDBOX_GUIDE.md** | Sandbox architecture, lifecycle, safety and validation |
+| **ROADMAP.md** | Current and future strategic direction |
+| **PROJECT_TERMINOLOGY.md** | Preferred project vocabulary |
+
+Other documents should link to the canonical owner rather than duplicate its detailed guidance.
 
 ---
 
@@ -80,12 +104,14 @@ These documents describe the long-lived aspects of the project, including:
 - Product vision
 - Product philosophy
 - Development workflow
+- Sandbox architecture and validation
 - Architectural intent
 - Roadmap
 - Terminology
 - Collaboration expectations
 
-They deliberately avoid duplicating implementation details that are already documented elsewhere.
+They avoid duplicating implementation details. Operational guides document
+required procedures while treating scripts and source code as authoritative.
 
 ---
 
@@ -97,22 +123,7 @@ The AI Context Pack is intended for:
 - Human contributors onboarding to the project.
 - Future maintainers seeking architectural context.
 
-The documents are intentionally AI-agnostic and should remain useful regardless of which tools or models are used.
-
----
-
-# Project Values
-
-Neovim-AIDE is guided by a small set of enduring values.
-
-- Correctness
-- Control
-- Traceability
-- Simplicity
-- Maintainability
-- Incremental improvement
-
-These values should inform both implementation decisions and AI-assisted collaboration.
+The enduring project principles are AI-agnostic. Role documents may identify the current assistants where operational responsibilities require it.
 
 ---
 

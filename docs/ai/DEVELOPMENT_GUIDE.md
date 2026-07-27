@@ -108,11 +108,11 @@ Confidence should come from evidence rather than assumption.
 
 ---
 
-# Sandbox-First Validation
+# Sandbox Validation
 
-Where practical, validate changes in an isolated sandbox environment before applying them to the primary development environment.
+Where practical, validate approved changes in the isolated sandbox before committing them.
 
-Sandbox validation reduces risk while encouraging experimentation.
+Follow `SANDBOX_GUIDE.md` for the canonical sandbox architecture, synchronisation, patch-transfer, safety and validation procedures.
 
 ---
 

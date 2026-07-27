@@ -112,13 +112,17 @@ Where practical, contributors are encouraged to validate changes using an isolat
 The typical workflow is:
 
 ```text
-Develop
+Inspect
     ↓
-Validate in Sandbox
+Edit
     ↓
-Verify Behaviour
+Local Checks
     ↓
-Submit
+Sandbox Validation
+    ↓
+Commit
+    ↓
+Push
 ```
 
 Sandbox-first validation helps identify installation issues, dependency problems and behavioural regressions before they reach other users.

@@ -10,14 +10,16 @@ Read the documents in this order:
 
 1. `docs/ai/README.md`
 2. `docs/ai/AI_DEVELOPMENT_MODEL.md`
-3. `docs/ai/PROJECT_CONTEXT.md`
-4. `docs/ai/PRODUCT_PHILOSOPHY.md`
-5. `docs/ai/DEVELOPMENT_GUIDE.md`
-6. `docs/ai/AI_WORKING_AGREEMENT.md`
-7. `docs/ai/ROADMAP.md`
-8. `docs/ai/PROJECT_TERMINOLOGY.md`
+3. `docs/ai/CODEX_ROLE.md`
+4. `docs/ai/PROJECT_CONTEXT.md`
+5. `docs/ai/PRODUCT_PHILOSOPHY.md`
+6. `docs/ai/DEVELOPMENT_GUIDE.md`
+7. `docs/ai/AI_WORKING_AGREEMENT.md`
+8. `docs/ai/SANDBOX_GUIDE.md`
+9. `docs/ai/ROADMAP.md`
+10. `docs/ai/PROJECT_TERMINOLOGY.md`
 
-These documents describe the project's development model, intent, philosophy, development practices, strategic direction and preferred terminology.
+These documents describe the project's development model, intent, philosophy, development practices, sandbox architecture and validation, strategic direction and preferred terminology.
 
 They complement—but never replace—the source code and technical documentation.
 
@@ -42,7 +44,15 @@ When collaborating:
 - The developer owns all technical and product decisions.
 - AI assistants should complement one another rather than duplicate responsibilities.
 
+When validating in the sandbox:
+
+- Read `docs/ai/SANDBOX_GUIDE.md` before beginning.
+- Never assume the sandbox contains the current project state.
+- Explicitly synchronise the committed baseline before testing.
+- Transfer approved uncommitted changes explicitly using the documented scoped patch workflow.
+- Stop if the sandbox is dirty, on the wrong branch, cannot fast-forward or fails a patch check.
+- Never use destructive Git operations to recover or synchronise the sandbox.
+
 The objective is not to maximise AI involvement.
 
 The objective is to maximise software quality.
-
