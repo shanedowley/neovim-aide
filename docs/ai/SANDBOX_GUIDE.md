@@ -29,6 +29,15 @@ Never assume that the sandbox contains the current project state. Before every
 validation session, identify the intended release branch, synchronise its
 committed baseline and transfer any approved uncommitted changes explicitly.
 
+The sandbox is disposable. Controlled incidental mutation inside it is
+acceptable when the main repository remains protected and only the approved
+patch remains after validation.
+
+When the process becomes more complex than the change being validated, prefer
+a simple procedural safeguard over expanding sandbox or bootstrap
+infrastructure. Do not expand that infrastructure without a concrete,
+demonstrated need.
+
 ---
 
 # Layout and Environment
@@ -182,6 +191,7 @@ Create a patch containing only approved files:
 ```bash
 PATCH_FILE=/tmp/neovim-aide-approved.patch
 git diff --binary HEAD -- <approved-files> > "$PATCH_FILE"
+SOURCE_PATCH_SHA=$(shasum -a 256 "$PATCH_FILE" | awk '{print $1}')
 ```
 
 Replace `<approved-files>` with an explicit file list. Inspect the patch before
@@ -194,10 +204,17 @@ git -C "$SANDBOX_REPO" apply --check "$PATCH_FILE"
 git -C "$SANDBOX_REPO" apply "$PATCH_FILE"
 git -C "$SANDBOX_REPO" diff --check
 git -C "$SANDBOX_REPO" diff
+SANDBOX_PATCH_SHA=$(
+  git -C "$SANDBOX_REPO" diff --binary HEAD -- <approved-files> \
+    | shasum -a 256 \
+    | awk '{print $1}'
+)
+test "$SANDBOX_PATCH_SHA" = "$SOURCE_PATCH_SHA"
 ```
 
 Stop if the patch is empty unexpectedly, includes unapproved changes, fails
-`apply --check`, or produces an unexpected sandbox diff.
+`apply --check`, produces an unexpected sandbox diff or does not match the
+source patch hash.
 
 `git diff --binary HEAD` includes approved tracked staged and unstaged changes.
 It does not include untracked files automatically. Untracked files require
@@ -205,6 +222,96 @@ separate, explicit review and transfer.
 
 Run `tools/sandbox.sh reset` after the patch is applied when a clean runtime
 cycle is required. Runtime reset preserves the patched repository.
+
+---
+
+# Validation Order
+
+For approved uncommitted changes, use this order:
+
+1. Synchronise the sandbox repository to the latest committed release-branch
+   baseline.
+2. Confirm the sandbox branch, `HEAD` and working tree are correct and clean.
+3. Create and inspect a patch containing only the approved files.
+4. Apply the patch and verify its SHA-256 against the source patch.
+5. Reset only the sandbox runtime state with `tools/sandbox.sh reset`.
+6. Apply the sandbox XDG environment.
+7. Back up and hash the sandbox `lazy-lock.json`.
+8. Install the lockfile restoration trap.
+9. Run bootstrap and the relevant startup and health validation.
+10. Explicitly restore `lazy-lock.json` and verify its original SHA-256.
+11. Verify that only the approved patch remains in the sandbox.
+12. Disable the restoration trap.
+13. Reverse only the transferred patch.
+14. Verify that the sandbox is clean and remains at the expected `HEAD`.
+15. Reconfirm that the main repository is unchanged.
+
+---
+
+# Lockfile Safety During Plugin Synchronisation
+
+`./scripts/bootstrap.sh --sync` may update the sandbox copy of
+`lazy-lock.json`. This incidental sandbox mutation is acceptable when it is
+controlled and reversed before patch removal.
+
+Before running `--sync`, identify the sandbox lockfile, create a temporary
+backup, record its SHA-256 and install a cleanup trap:
+
+```bash
+LOCKFILE="$SANDBOX_REPO/lazy-lock.json"
+LOCK_BACKUP=$(mktemp "${TMPDIR:-/tmp}/neovim-aide-lazy-lock.XXXXXX")
+
+cp "$LOCKFILE" "$LOCK_BACKUP"
+ORIGINAL_LOCK_SHA=$(shasum -a 256 "$LOCK_BACKUP" | awk '{print $1}')
+
+cleanup_sandbox_validation() {
+  if [ -n "${LOCK_BACKUP:-}" ] &&
+     [ -f "${LOCK_BACKUP:-}" ] &&
+     [ -n "${LOCKFILE:-}" ]
+  then
+    cp "$LOCK_BACKUP" "$LOCKFILE"
+  fi
+}
+trap cleanup_sandbox_validation EXIT INT TERM
+```
+
+The trap must be active before bootstrap or Neovim validation begins. It must
+remain active until the lockfile has been explicitly restored and its hash has
+been verified.
+
+After bootstrap, startup and health validation, restore and verify the
+lockfile:
+
+```bash
+cp "$LOCK_BACKUP" "$LOCKFILE"
+RESTORED_LOCK_SHA=$(shasum -a 256 "$LOCKFILE" | awk '{print $1}')
+test "$RESTORED_LOCK_SHA" = "$ORIGINAL_LOCK_SHA"
+
+git -C "$SANDBOX_REPO" status --short
+```
+
+The status output must name only the approved patch files. Verify their patch
+hash again, then disable the trap:
+
+```bash
+SANDBOX_PATCH_SHA=$(
+  git -C "$SANDBOX_REPO" diff --binary HEAD -- <approved-files> \
+    | shasum -a 256 \
+    | awk '{print $1}'
+)
+test "$SANDBOX_PATCH_SHA" = "$SOURCE_PATCH_SHA"
+
+trap - EXIT INT TERM
+```
+
+Do not disable the trap before the explicit restoration and SHA-256 check have
+succeeded.
+
+If bootstrap or a network operation fails and the validation shell exits, the
+trap restores the sandbox lockfile without altering the main repository.
+Runtime state may then be reset with `tools/sandbox.sh reset`, and validation
+may be retried in the disposable sandbox. Recreate the backup and trap before
+the retry.
 
 ---
 
@@ -290,17 +397,22 @@ new command as established project behaviour.
 
 # Safe Patch Removal
 
-After validation, remove only the transferred patch:
+After the lockfile has been restored and verified and the trap has been
+disabled, remove only the transferred patch:
 
 ```bash
 git -C "$SANDBOX_REPO" apply --reverse --check "$PATCH_FILE"
 git -C "$SANDBOX_REPO" apply --reverse "$PATCH_FILE"
 git -C "$SANDBOX_REPO" status --short --branch
+git -C "$SANDBOX_REPO" rev-parse HEAD
 ```
 
 Stop if the reverse check fails. Do not substitute a hard reset or clean
 operation. Validation may have produced additional evidence or changes that
 must be reviewed separately.
+
+Finally, reconfirm that the main repository still has its expected branch,
+`HEAD` and approved working-tree state.
 
 ---
 
