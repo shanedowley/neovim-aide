@@ -45,16 +45,16 @@ The AI Context Pack follows the same principles as the rest of Neovim-AIDE.
 
 AI assistants should read these documents in the following order.
 
-1. **README.md** _(this document)_
-2. **AI_DEVELOPMENT_MODEL.md**
-3. **CODEX_ROLE.md**
-4. **PROJECT_CONTEXT.md**
-5. **PRODUCT_PHILOSOPHY.md**
-6. **DEVELOPMENT_GUIDE.md**
-7. **AI_WORKING_AGREEMENT.md**
-8. **SANDBOX_GUIDE.md**
-9. **ROADMAP.md**
-10. **PROJECT_TERMINOLOGY.md**
+1. **[README.md](README.md)** _(this document)_
+2. **[AI_DEVELOPMENT_MODEL.md](AI_DEVELOPMENT_MODEL.md)**
+3. **[CODEX_ROLE.md](CODEX_ROLE.md)**
+4. **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)**
+5. **[PRODUCT_PHILOSOPHY.md](PRODUCT_PHILOSOPHY.md)**
+6. **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**
+7. **[AI_WORKING_AGREEMENT.md](AI_WORKING_AGREEMENT.md)**
+8. **[SANDBOX_GUIDE.md](SANDBOX_GUIDE.md)**
+9. **[ROADMAP.md](ROADMAP.md)**
+10. **[PROJECT_TERMINOLOGY.md](PROJECT_TERMINOLOGY.md)**
 
 Each document has a distinct purpose. Together they provide a complete understanding of the project's direction, expectations and development practices.
 
@@ -66,16 +66,16 @@ Each subject has one canonical owner.
 
 | Document | Canonical responsibility |
 | --- | --- |
-| **README.md** | Context Pack index, scope and authority |
-| **AI_DEVELOPMENT_MODEL.md** | Team roles and the collaboration model |
-| **CODEX_ROLE.md** | Codex-specific repository responsibilities and boundaries |
-| **PROJECT_CONTEXT.md** | Concise project onboarding overview |
-| **PRODUCT_PHILOSOPHY.md** | Enduring product values and principles |
-| **DEVELOPMENT_GUIDE.md** | Development practices and quality expectations |
-| **AI_WORKING_AGREEMENT.md** | AI communication and decision-support behaviour |
-| **SANDBOX_GUIDE.md** | Sandbox architecture, lifecycle, safety and validation |
-| **ROADMAP.md** | Current and future strategic direction |
-| **PROJECT_TERMINOLOGY.md** | Preferred project vocabulary |
+| **[README.md](README.md)** | Context Pack index, scope and authority |
+| **[AI_DEVELOPMENT_MODEL.md](AI_DEVELOPMENT_MODEL.md)** | Team roles and the collaboration model |
+| **[CODEX_ROLE.md](CODEX_ROLE.md)** | Codex-specific repository responsibilities and boundaries |
+| **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)** | Concise project onboarding overview |
+| **[PRODUCT_PHILOSOPHY.md](PRODUCT_PHILOSOPHY.md)** | Enduring product values and principles |
+| **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** | Development practices and quality expectations |
+| **[AI_WORKING_AGREEMENT.md](AI_WORKING_AGREEMENT.md)** | AI communication and decision-support behaviour |
+| **[SANDBOX_GUIDE.md](SANDBOX_GUIDE.md)** | Sandbox architecture, lifecycle, safety and validation |
+| **[ROADMAP.md](ROADMAP.md)** | Current and future strategic direction |
+| **[PROJECT_TERMINOLOGY.md](PROJECT_TERMINOLOGY.md)** | Preferred project vocabulary |
 
 Other documents should link to the canonical owner rather than duplicate its detailed guidance.
 
