@@ -25,15 +25,11 @@ Whether you are using Neovim-AIDE in your daily software development workflow or
 
 Begin with:
 
-```text
-README.md
-```
+[Project README](../README.md)
 
 Then continue with:
 
-```text
-INSTALL.md
-```
+[Installation Guide](../INSTALL.md)
 
 The README introduces Neovim-AIDE, while the installation guide covers installation, bootstrap, validation and your first AI-assisted workflow.
 
@@ -43,9 +39,7 @@ The README introduces Neovim-AIDE, while the installation guide covers installat
 
 Begin with:
 
-```text
-CONTRIBUTING.md
-```
+[Contributor Guide](CONTRIBUTING.md)
 
 The contributor guide explains the project's development philosophy, contribution workflow and expectations for submitting changes.
 
@@ -55,16 +49,16 @@ The contributor guide explains the project's development philosophy, contributio
 
 The documentation is organised into a small number of focused guides.
 
-| Document          | Purpose                                                            |
-| ----------------- | ------------------------------------------------------------------ |
-| `README.md`       | Product overview and quick start                                   |
-| `INSTALL.md`      | Installation, bootstrap and validation                             |
-| `COMMANDS.md`     | Reference for commands, key mappings and AI-assisted workflows     |
-| `ARCHITECTURE.md` | Explains the runtime architecture and major subsystems             |
-| `CONTRIBUTING.md` | Contributor workflow, philosophy and development practices         |
-| `INSTALL.md`      | Guidence for Neovim-AIDE installation and first time set up        |
-| `contributor/`    | Additional contributor guidance and project-specific documentation |
-| `releases/`       | Historical release notes and release documentation                 |
+| Document | Purpose |
+| --- | --- |
+| [Project README](../README.md) | Product overview and quick start |
+| [Installation Guide](../INSTALL.md) | Installation, bootstrap and validation |
+| [Command Reference](COMMANDS.md) | Reference for commands, key mappings and AI-assisted workflows |
+| [Architecture Guide](ARCHITECTURE.md) | Explains the runtime architecture and major subsystems |
+| [Contributor Guide](CONTRIBUTING.md) | Contributor workflow, philosophy and development practices |
+| [AI Context Pack](ai/README.md) | Starting point for AI tools or collaborators working on the repository |
+| [Additional Contributor Guidance](contributor/README.md) | Additional contributor guidance and project-specific documentation |
+| [Release Documentation](releases/) | Historical release notes and release documentation |
 
 ---
 
@@ -78,6 +72,7 @@ docs/
 ├── CONTRIBUTING.md
 ├── README.md
 │
+├── ai/
 ├── contributor/
 │
 └── releases/
@@ -133,4 +128,3 @@ If you cannot find the information you are looking for:
 - open a GitHub discussion or issue if you believe documentation is missing or unclear
 
 Improving documentation is always a welcome contribution.
-
