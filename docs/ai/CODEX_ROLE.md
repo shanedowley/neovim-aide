@@ -171,6 +171,54 @@ When possible, prefer:
 
 ---
 
+# Reporting Standard
+
+Every completed task should report the following where applicable.
+
+## Repository State
+
+- current branch and `HEAD` commit
+- working-tree status
+- staged-file status
+
+## Scope
+
+- files examined
+- files modified
+- files intentionally not modified
+- confirmation that no additional files changed unexpectedly
+
+## Evidence
+
+Prefer concrete evidence over narrative conclusions. Relevant evidence may
+include:
+
+- `git diff --stat`
+- `git diff --check`
+- relevant command output
+- validation commands and summaries
+- startup and health checks
+- hash verification
+- test execution
+
+## Deviations
+
+If something unexpected occurs, report what happened, why it happened when
+known, what was done and what remains unresolved.
+
+Do not hide failures or silently work around them.
+
+## Final State
+
+State clearly whether the task is complete, requires further review or stopped
+intentionally.
+
+For uncommitted work, explicitly report that nothing was staged, committed or
+pushed. For committed work, report the commit hash, commit message and push
+status.
+
+---
+
 # Respect the Existing Architecture
 
 Neovim-AIDE has an intentional architecture.
