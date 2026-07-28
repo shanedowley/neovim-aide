@@ -39,39 +39,27 @@ defined in `PRODUCT_PHILOSOPHY.md`.
 
 # Current Direction
 
-The current focus is to improve the everyday developer experience.
+The agreed release sequence is:
 
-Priority is given to improvements that:
+## R1.6 — Code and Documentation Cleanup
 
-- reduce development friction
-- improve navigation
-- improve understanding
-- improve confidence
-- integrate naturally with existing workflows
+R1.6 focuses on removing obsolete, redundant and unnecessary code and
+consolidating project documentation.
 
----
+The release preserves existing behaviour and prepares a clean foundation for
+future development.
 
-# Near-Term Direction
+## R2.0 — Java Support
 
-Near-term development focuses on strengthening the AI integration while preserving architectural simplicity.
+R2.0 will extend Neovim-AIDE with Java development support.
 
-Areas of investment include:
+Java support should integrate with the existing architecture and preserve the
+project's human-controlled workflow model.
 
-- provider abstraction
-- model flexibility
-- workflow improvements
-- developer productivity
-- operational robustness
+## R3.0 — Provider/Model Abstraction and OpenRouter
 
----
-
-# Longer-Term Direction
-
-As the platform matures, future development may expand into additional language ecosystems and development workflows.
-
-Expansion should build upon the existing architecture rather than replacing it.
-
-Future capabilities should remain consistent with the project's philosophy of human-controlled, AI-assisted development.
+R3.0 will introduce provider and model abstraction, including OpenRouter
+integration.
 
 ---
 

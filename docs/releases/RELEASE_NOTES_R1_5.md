@@ -98,9 +98,15 @@ No breaking user-facing workflow changes have been introduced.
 
 # Looking Ahead
 
-Release 2.0 will focus on provider abstraction and multi-model support.
+The agreed release sequence after R1.5 is:
 
-The architecture introduced in earlier releases provides the foundation for future AI backends while preserving the predictable workflows and developer control established throughout the project.
+- **R1.6 — Code and documentation cleanup**
+- **R2.0 — Java support**
+- **R3.0 — Provider/model abstraction and OpenRouter**
+
+These releases will build incrementally on the existing architecture while
+preserving the predictable workflows and developer control established
+throughout the project.
 
 ---
 
@@ -111,4 +117,3 @@ Thank you to everyone using, testing and contributing to Neovim-AIDE.
 Every release is built through careful, incremental development with a continued focus on correctness, control and traceability.
 
 **Human-controlled. AI-assisted.**
-
