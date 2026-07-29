@@ -2,7 +2,6 @@
 return {
 	-- ✅ Core (load eagerly at startup)
 	{ import = "plugins.cmp" },
-	{ import = "plugins.lsp" },
 	{ import = "plugins.treesitter" },
 	{ import = "plugins.ui" },
 	{ import = "plugins.snippets" },
