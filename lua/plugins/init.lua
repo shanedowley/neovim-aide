@@ -1,7 +1,6 @@
 -- Lazy.nvim plugin imports (new keymaps/which-key modules)
 return {
 	-- ✅ Core (load eagerly at startup)
-	{ import = "plugins.cmp" },
 	{ import = "plugins.treesitter" },
 	{ import = "plugins.ui" },
 	{ import = "plugins.snippets" },
