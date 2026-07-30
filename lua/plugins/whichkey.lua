@@ -392,63 +392,6 @@ return {
 				},
 
 				----------------------------------------------------------------------
-				-- HOP
-				----------------------------------------------------------------------
-				{
-					"<leader>h",
-					group = "+hop",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hw",
-					"<cmd>HopWord<CR>",
-					desc = "Hop word",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hc",
-					"<cmd>HopChar1<CR>",
-					desc = "Hop char",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hl",
-					"<cmd>HopLine<CR>",
-					desc = "Hop line",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hp",
-					"<cmd>HopPattern<CR>",
-					desc = "Hop pattern",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>ha",
-					"<cmd>HopAnywhere<CR>",
-					desc = "Hop anywhere",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-
-				----------------------------------------------------------------------
 				-- LATEX
 				----------------------------------------------------------------------
 				{ "<leader>x", group = "+latex", mode = "n" },
@@ -674,11 +617,6 @@ return {
 
 		config = function(_, opts)
 			require("which-key").setup(opts)
-			vim.api.nvim_create_user_command("WKDump", function()
-				local state = require("which-key.state")
-				vim.cmd("new")
-				vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(vim.inspect(state.registry), "\n"))
-			end, { desc = "Dump which-key registry for debugging" })
 		end,
 	},
 }
