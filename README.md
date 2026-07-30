@@ -48,34 +48,22 @@ The goal is trustworthy AI-assisted software development.
 
 # Latest Release
 
-**Current Public Release: R1.5**
+**Current Public Release: R1.6**
 
-Neovim-AIDE R1.5 is a focused Developer Flow release.
+Neovim-AIDE R1.6 is a focused code and documentation cleanup release.
 
 Highlights include:
 
-- Explain Current Buffer
-- Explain Current Function and Class
-- Review Current Function and Class
-- Improved developer navigation
-- Documentation refresh
+- leaner startup and plugin discovery
+- removal of obsolete and experimental configuration
+- clearer mapping ownership
+- consolidated development and sandbox documentation
 
 Release notes:
 
-- `docs/releases/RELEASE_NOTES_R1_5.md`
+- `docs/releases/RELEASE_NOTES_R1_6.md`
 
 Earlier release notes are listed in the Documentation section below.
-
-## Upcoming Release
-
-**R1.6 — Code and documentation cleanup**
-
-R1.6 is currently an upcoming release candidate and has not yet been
-published.
-
-Release candidate notes:
-
-- `docs/releases/RELEASE_NOTES_R1_6.md`
 
 ---
 
@@ -214,7 +202,7 @@ Complete documentation map.
 - `docs/releases/RELEASE_NOTES_R1_3.md`
 - `docs/releases/RELEASE_NOTES_R1_4.md`
 - `docs/releases/RELEASE_NOTES_R1_5.md`
-- `docs/releases/RELEASE_NOTES_R1_6.md` _(release candidate; pending publication)_
+- `docs/releases/RELEASE_NOTES_R1_6.md`
 
 ---
 

@@ -9,8 +9,6 @@
 
 **Repository Cleanup and Architectural Consistency**
 
-**Status: Release candidate — pending publication**
-
 ---
 
 ## Overview

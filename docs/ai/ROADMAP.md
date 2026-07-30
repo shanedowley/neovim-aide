@@ -37,17 +37,19 @@ defined in `PRODUCT_PHILOSOPHY.md`.
 
 ---
 
-# Current Direction
-
-The agreed release sequence is:
+# Completed Release
 
 ## R1.6 — Code and Documentation Cleanup
 
-R1.6 focuses on removing obsolete, redundant and unnecessary code and
-consolidating project documentation.
+R1.6 removed obsolete, redundant and unnecessary code and consolidated project
+documentation.
 
-The release preserves existing behaviour and prepares a clean foundation for
+The release preserved existing behaviour and prepared a clean foundation for
 future development.
+
+# Current Direction
+
+The agreed release sequence is:
 
 ## R2.0 — Java Support
 
