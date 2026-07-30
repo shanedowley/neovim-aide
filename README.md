@@ -66,6 +66,17 @@ Release notes:
 
 Earlier release notes are listed in the Documentation section below.
 
+## Upcoming Release
+
+**R1.6 — Code and documentation cleanup**
+
+R1.6 is currently an upcoming release candidate and has not yet been
+published.
+
+Release candidate notes:
+
+- `docs/releases/RELEASE_NOTES_R1_6.md`
+
 ---
 
 # Developer Flow
@@ -151,6 +162,7 @@ For complete installation instructions see:
 - git
 - clang
 - diff
+- Node.js, including npm and npx
 - Codex CLI
 - authenticated OpenAI account
 
@@ -158,13 +170,6 @@ For complete installation instructions see:
 
 - Neovim 0.12.x
 - macOS Apple Silicon
-
-## Optional
-
-- Node.js
-- npm
-
-Node.js is only required for JavaScript-related workflows.
 
 ---
 
@@ -208,6 +213,8 @@ Complete documentation map.
 - `docs/releases/RELEASE_NOTES_R1_1.md`
 - `docs/releases/RELEASE_NOTES_R1_3.md`
 - `docs/releases/RELEASE_NOTES_R1_4.md`
+- `docs/releases/RELEASE_NOTES_R1_5.md`
+- `docs/releases/RELEASE_NOTES_R1_6.md` _(release candidate; pending publication)_
 
 ---
 
@@ -253,14 +260,14 @@ Neovim-AIDE is currently developed and validated on macOS Apple Silicon.
 
 # Roadmap
 
-Near-term development focuses on:
+The agreed release sequence is:
 
-- continued developer workflow improvements
-- platform hardening
-- documentation quality
-- operational observability
+- **R1.6 — Code and documentation cleanup**
+- **R2.0 — Java support**
+- **R3.0 — Provider/model abstraction and OpenRouter**
 
-Future major releases will introduce provider abstraction and support for multiple AI model providers while preserving the existing human-controlled workflow model.
+Each release will preserve Neovim-AIDE's human-controlled workflow model and
+build incrementally on the existing architecture.
 
 ---
 

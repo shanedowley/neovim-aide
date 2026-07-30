@@ -88,21 +88,17 @@ The project values reproducible workflows over environment-specific behaviour.
 Every contribution should follow the same engineering workflow.
 
 ```text
-Observe
+Inspect
     ↓
-Analyse
+Edit
     ↓
-Design
-    ↓
-Implement
-    ↓
-Validate
-    ↓
-Commit
+Local Checks
     ↓
 Sandbox Validation
     ↓
-Review
+Commit
+    ↓
+Push
 ```
 
 Small, independently testable changes are preferred over large feature branches.
@@ -118,23 +114,17 @@ Engineering confidence is built through incremental progress and continuous vali
 Contributions typically follow this lifecycle.
 
 ```text
-Issue / Idea
-      ↓
-Understand the Problem
-      ↓
-Design the Change
-      ↓
-Implement
-      ↓
-Validate Locally
-      ↓
-Validate in Sandbox
-      ↓
+Inspect
+   ↓
+Edit
+   ↓
+Local Checks
+   ↓
+Sandbox Validation
+   ↓
 Commit
-      ↓
-Review
-      ↓
-Merge
+   ↓
+Push
 ```
 
 Keeping each contribution focused makes review easier and reduces the risk of regressions.
@@ -147,7 +137,7 @@ Additional contributor documentation is organised into focused guides.
 
 | Guide        | Purpose                                                      |
 | ------------ | ------------------------------------------------------------ |
-| `SANDBOX.md` | Sandbox setup, validation workflow and release verification. |
+| `SANDBOX.md` | Contributor overview and entry point to the canonical sandbox guide. |
 
 As the project grows, additional contributor guides may be added.
 

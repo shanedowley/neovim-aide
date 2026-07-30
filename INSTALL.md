@@ -35,24 +35,16 @@ Linux support is actively improving but should currently be regarded as experime
 
 ## Required Dependencies
 
-| Dependency   | Purpose               |
-| ------------ | --------------------- |
-| Neovim 0.11+ | Editor runtime        |
-| Git          | Repository management |
-| Clang        | Validation pipeline   |
-| Diff         | Preview generation    |
-| Codex CLI    | AI-assisted workflows |
+| Dependency            | Purpose                                 |
+| --------------------- | --------------------------------------- |
+| Neovim 0.11+          | Editor runtime                          |
+| Git                   | Repository management                  |
+| Clang                 | Validation pipeline                    |
+| Diff                  | Preview generation                     |
+| Node.js, npm and npx  | Markdown Preview and JavaScript tooling |
+| Codex CLI             | AI-assisted workflows                  |
 
 Without Codex CLI, Neovim-AIDE remains fully usable as a Neovim configuration, but AI-assisted workflows will not be available.
-
----
-
-## Optional Dependencies
-
-| Dependency | Purpose                       |
-| ---------- | ----------------------------- |
-| Node.js    | JavaScript tooling            |
-| npm        | JavaScript package management |
 
 ---
 

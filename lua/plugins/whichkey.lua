@@ -91,8 +91,6 @@ return {
 				----------------------------------------------------------------------
 				{ "<leader>f", group = "+file", mode = "n" },
 				{ "<leader>fe", "<cmd>NvimTreeToggle<CR>", desc = "Explorer", mode = "n" },
-				{ "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find file", mode = "n" },
-				{ "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Live grep", mode = "n" },
 				{ "<leader>fr", "<cmd>Telescope oldfiles<CR>", desc = "Recent files", mode = "n" },
 				{ "<leader>fs", "<cmd>w<CR>", desc = "Save file", mode = "n" },
 				{ "<leader>fS", "<cmd>wa<CR>", desc = "Save all", mode = "n" },
@@ -111,10 +109,6 @@ return {
 				-- WINDOWS
 				----------------------------------------------------------------------
 				{ "<leader>w", group = "+window", mode = "n" },
-				{ "<leader>wh", "<C-w>h", desc = "Go left", mode = "n" },
-				{ "<leader>wj", "<C-w>j", desc = "Go down", mode = "n" },
-				{ "<leader>wk", "<C-w>k", desc = "Go up", mode = "n" },
-				{ "<leader>wl", "<C-w>l", desc = "Go right", mode = "n" },
 				{ "<leader>wv", "<cmd>vsplit<CR>", desc = "Vertical split", mode = "n" },
 				{ "<leader>ws", "<cmd>split<CR>", desc = "Horizontal split", mode = "n" },
 				{ "<leader>wq", "<cmd>q<CR>", desc = "Close window", mode = "n" },
@@ -238,14 +232,6 @@ return {
 					desc = "Type def",
 					mode = "n",
 				},
-				{
-					"<leader>lf",
-					function()
-						vim.lsp.buf.format({ async = true })
-					end,
-					desc = "Format",
-					mode = "n",
-				},
 				{ "<leader>ls", "<cmd>Telescope lsp_document_symbols<CR>", desc = "Document symbols", mode = "n" },
 				{
 					"<leader>lS",
@@ -287,50 +273,6 @@ return {
 				-- TEST
 				----------------------------------------------------------------------
 				{ "<leader>t", group = "+test", mode = "n" },
-				{
-					"<leader>tn",
-					function()
-						require("neotest").run.run()
-					end,
-					desc = "Run nearest",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>tf",
-					function()
-						require("neotest").run.run(vim.fn.expand("%"))
-					end,
-					desc = "Run file",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>to",
-					function()
-						require("neotest").output.open({ enter = true })
-					end,
-					desc = "Open output",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>ts",
-					function()
-						require("neotest").summary.toggle()
-					end,
-					desc = "Toggle summary",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
 
 				----------------------------------------------------------------------
 				-- SESSIONS
@@ -392,140 +334,9 @@ return {
 				},
 
 				----------------------------------------------------------------------
-				-- HOP
-				----------------------------------------------------------------------
-				{
-					"<leader>h",
-					group = "+hop",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hw",
-					"<cmd>HopWord<CR>",
-					desc = "Hop word",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hc",
-					"<cmd>HopChar1<CR>",
-					desc = "Hop char",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hl",
-					"<cmd>HopLine<CR>",
-					desc = "Hop line",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>hp",
-					"<cmd>HopPattern<CR>",
-					desc = "Hop pattern",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>ha",
-					"<cmd>HopAnywhere<CR>",
-					desc = "Hop anywhere",
-					cond = function()
-						return pcall(require, "hop")
-					end,
-					mode = "n",
-				},
-
-				----------------------------------------------------------------------
-				-- LaTeX (VimTeX)
-				----------------------------------------------------------------------
-				{ "<leader>x", group = "+latex", mode = "n" },
-				{
-					"<leader>xc",
-					"<cmd>VimtexCompile<CR>",
-					desc = "Compile (vimtex)",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>xv",
-					"<cmd>VimtexView<CR>",
-					desc = "View (vimtex)",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>xp",
-					function()
-						local pdf = vim.fn.expand("%:p:r") .. ".pdf"
-						if vim.fn.filereadable(pdf) == 0 then
-							vim.notify("PDF not found. Compile first (<leader>xc).", vim.log.levels.WARN)
-							return
-						end
-						vim.fn.jobstart({ "open", "-a", "Preview", pdf }, { detach = true })
-					end,
-					desc = "Preview (fallback)",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
-
-				----------------------------------------------------------------------
 				-- MARKDOWN
 				----------------------------------------------------------------------
 				{ "<leader>M", group = "+markdown", mode = "n" },
-
-				----------------------------------------------------------------------
-				-- PDF TOOLS
-				----------------------------------------------------------------------
-				{ "<leader>P", group = "+pdf", mode = "n" },
-				{
-					"<leader>Pc",
-					function()
-						local texfile = vim.fn.expand("%:p")
-						vim.fn.jobstart({ "pdflatex", texfile }, { detach = true })
-						vim.notify("Compiling PDF with pdflatex…", vim.log.levels.INFO)
-					end,
-					desc = "Compile with pdflatex",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>Po",
-					function()
-						local pdffile = vim.fn.expand("%:p:r") .. ".pdf"
-						if vim.fn.filereadable(pdffile) == 0 then
-							vim.notify("PDF not found. Compile first (<leader>Pc).", vim.log.levels.WARN)
-							return
-						end
-						vim.fn.jobstart({ "open", pdffile }, { detach = true })
-						vim.notify("Opening PDF in default viewer…", vim.log.levels.INFO)
-					end,
-					desc = "Open in default viewer",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
 
 				----------------------------------------------------------------------
 				-- RUN
@@ -589,22 +400,6 @@ return {
 					mode = "x",
 				},
 				{
-					"<leader>mb",
-					function()
-						vim.cmd("normal ysiw)")
-					end,
-					desc = "Surround word with parentheses",
-					mode = "n",
-				},
-				{
-					"<leader>mb",
-					function()
-						vim.cmd("normal S)")
-					end,
-					desc = "Surround selection with parentheses",
-					mode = "x",
-				},
-				{
 					"<leader>mB",
 					function()
 						vim.cmd("normal ysiw}")
@@ -653,22 +448,6 @@ return {
 					mode = "x",
 				},
 				{
-					"<leader>mp",
-					function()
-						vim.cmd("normal ysiw`")
-					end,
-					desc = "Surround word with backticks",
-					mode = "n",
-				},
-				{
-					"<leader>mp",
-					function()
-						vim.cmd("normal S`")
-					end,
-					desc = "Surround selection with backticks",
-					mode = "x",
-				},
-				{
 					"<leader>md",
 					desc = "Delete surround",
 					function()
@@ -692,11 +471,6 @@ return {
 
 		config = function(_, opts)
 			require("which-key").setup(opts)
-			vim.api.nvim_create_user_command("WKDump", function()
-				local state = require("which-key.state")
-				vim.cmd("new")
-				vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(vim.inspect(state.registry), "\n"))
-			end, { desc = "Dump which-key registry for debugging" })
 		end,
 	},
 }

@@ -38,7 +38,6 @@ vim.o.timeoutlen = 1000
 -- Cursor settings and behaviours
 vim.o.guicursor = table.concat({
 	"n-v:block", -- Normal + Visual = block
-	"i:hor20", -- Insert = horizontal underline (20% height)
 	"i:hor20-blinkwait600-blinkon700-blinkoff600", -- blinking
 	"r-cr:hor20", -- Replace & Command-replace = underline too
 	"c-sm:hor20", -- Command-line & Select-mode = underline
@@ -125,7 +124,7 @@ vim.opt.mousescroll = "ver:3,hor:6"
 
 -- Lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-local uv = vim.uv or vim.loop
+local uv = vim.uv
 
 if not uv.fs_stat(lazypath) then
 	vim.fn.system({
@@ -169,7 +168,7 @@ pcall(function()
 end)
 
 -- --------------------------------------------------------------------
--- LSP: clangd (Neovim 0.11+ native config; fallback to nvim-lspconfig)
+-- LSP: clangd (Neovim 0.11+ native config)
 -- --------------------------------------------------------------------
 
 local caps = vim.lsp.protocol.make_client_capabilities()
@@ -218,22 +217,8 @@ local clangd_cfg = {
 	filetypes = { "c", "cpp", "objc", "objcpp" },
 }
 
-if vim.lsp.config and vim.lsp.enable then
-	vim.lsp.config.clangd = clangd_cfg
-	vim.lsp.enable("clangd")
-else
-	local ok_lspconfig, lspconfig = pcall(require, "lspconfig")
-	if ok_lspconfig then
-		lspconfig.clangd.setup({
-			cmd = { "clangd" },
-			capabilities = caps,
-			root_dir = function(fname)
-				return project_override_root(fname) or detect_project_root(fname)
-			end,
-			filetypes = { "c", "cpp", "objc", "objcpp" },
-		})
-	end
-end
+vim.lsp.config.clangd = clangd_cfg
+vim.lsp.enable("clangd")
 
 -- Soft wrap for coding
 vim.opt.wrap = true
