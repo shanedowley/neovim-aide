@@ -3,6 +3,16 @@ return {
   {
     "stevearc/conform.nvim",
     event = { "BufReadPre", "BufNewFile" },
+    keys = {
+      {
+        "<leader>lf",
+        function()
+          require("conform").format({ async = true, lsp_fallback = true })
+        end,
+        desc = "Format: buffer",
+        mode = "n",
+      },
+    },
     config = function()
       local conform = require("conform")
 
@@ -50,13 +60,7 @@ return {
         -- prefer local node prettier if present
         prefer_local = "node_modules/.bin",
       }
-
-      -- Handy keymap: format the current buffer
-      vim.keymap.set("n", "<leader>lf", function()
-        require("conform").format({ async = true, lsp_fallback = true })
-      end, { desc = "Format: buffer" })
     end,
   },
 }
-
 

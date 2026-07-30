@@ -232,14 +232,6 @@ return {
 					desc = "Type def",
 					mode = "n",
 				},
-				{
-					"<leader>lf",
-					function()
-						vim.lsp.buf.format({ async = true })
-					end,
-					desc = "Format",
-					mode = "n",
-				},
 				{ "<leader>ls", "<cmd>Telescope lsp_document_symbols<CR>", desc = "Document symbols", mode = "n" },
 				{
 					"<leader>lS",
