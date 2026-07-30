@@ -408,22 +408,6 @@ return {
 					mode = "x",
 				},
 				{
-					"<leader>mb",
-					function()
-						vim.cmd("normal ysiw)")
-					end,
-					desc = "Surround word with parentheses",
-					mode = "n",
-				},
-				{
-					"<leader>mb",
-					function()
-						vim.cmd("normal S)")
-					end,
-					desc = "Surround selection with parentheses",
-					mode = "x",
-				},
-				{
 					"<leader>mB",
 					function()
 						vim.cmd("normal ysiw}")
@@ -469,22 +453,6 @@ return {
 						vim.cmd("normal S>")
 					end,
 					desc = "Surround selection with angle brackets",
-					mode = "x",
-				},
-				{
-					"<leader>mp",
-					function()
-						vim.cmd("normal ysiw`")
-					end,
-					desc = "Surround word with backticks",
-					mode = "n",
-				},
-				{
-					"<leader>mp",
-					function()
-						vim.cmd("normal S`")
-					end,
-					desc = "Surround selection with backticks",
 					mode = "x",
 				},
 				{

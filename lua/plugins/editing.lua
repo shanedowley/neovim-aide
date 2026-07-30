@@ -63,6 +63,44 @@ return {
 	{
 		"kylechui/nvim-surround",
 		event = "VeryLazy",
+		keys = {
+			{
+				"<leader>mb",
+				function()
+					local keys = vim.api.nvim_replace_termcodes("ysiw{", true, false, true)
+					vim.api.nvim_feedkeys(keys, "m", false)
+				end,
+				desc = "Surround word with braces",
+				mode = "n",
+			},
+			{
+				"<leader>mb",
+				function()
+					local keys = vim.api.nvim_replace_termcodes("S{", true, false, true)
+					vim.api.nvim_feedkeys(keys, "m", false)
+				end,
+				desc = "Surround selection with braces",
+				mode = "x",
+			},
+			{
+				"<leader>mp",
+				function()
+					local keys = vim.api.nvim_replace_termcodes("ysiw(", true, false, true)
+					vim.api.nvim_feedkeys(keys, "m", false)
+				end,
+				desc = "Surround word with parentheses",
+				mode = "n",
+			},
+			{
+				"<leader>mp",
+				function()
+					local keys = vim.api.nvim_replace_termcodes("S(", true, false, true)
+					vim.api.nvim_feedkeys(keys, "m", false)
+				end,
+				desc = "Surround selection with parentheses",
+				mode = "x",
+			},
+		},
 		config = function()
 			require("nvim-surround").setup({})
 
@@ -72,20 +110,6 @@ return {
 					{
 						"<leader>m",
 						group = "+surround",
-					},
-					{
-						"<leader>mb",
-						function()
-							vim.cmd("normal ysiw{")
-						end,
-						desc = "Surround word with {}",
-					},
-					{
-						"<leader>mp",
-						function()
-							vim.cmd("normal ysiw(")
-						end,
-						desc = "Surround word with ()",
 					},
 					{
 						"<leader>mq",
