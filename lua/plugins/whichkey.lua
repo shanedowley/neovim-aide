@@ -449,27 +449,9 @@ return {
 				},
 
 				----------------------------------------------------------------------
-				-- LaTeX (VimTeX)
+				-- LATEX
 				----------------------------------------------------------------------
 				{ "<leader>x", group = "+latex", mode = "n" },
-				{
-					"<leader>xc",
-					"<cmd>VimtexCompile<CR>",
-					desc = "Compile (vimtex)",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>xv",
-					"<cmd>VimtexView<CR>",
-					desc = "View (vimtex)",
-					cond = function()
-						return vim.bo.filetype == "tex"
-					end,
-					mode = "n",
-				},
 				{
 					"<leader>xp",
 					function()
