@@ -162,6 +162,7 @@ For complete installation instructions see:
 - git
 - clang
 - diff
+- Node.js, including npm and npx
 - Codex CLI
 - authenticated OpenAI account
 
@@ -169,13 +170,6 @@ For complete installation instructions see:
 
 - Neovim 0.12.x
 - macOS Apple Silicon
-
-## Optional
-
-- Node.js
-- npm
-
-Node.js is only required for JavaScript-related workflows.
 
 ---
 

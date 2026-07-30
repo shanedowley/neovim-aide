@@ -6,17 +6,18 @@ return {
 		cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
 
 		build = function(plugin)
+			local yarn = "yarn"
+
 			if vim.fn.executable("yarn") ~= 1 then
-				vim.notify(
-					"markdown-preview.nvim build skipped: yarn not found",
-					vim.log.levels.WARN,
-					{ title = "markdown-preview.nvim" }
-				)
-				return
+				if vim.fn.executable("npx") ~= 1 then
+					error("markdown-preview.nvim requires npm/npx when yarn is not installed")
+				end
+
+				yarn = "npx --yes yarn"
 			end
 
 			local app_dir = plugin.dir .. "/app"
-			local cmd = "cd " .. vim.fn.shellescape(app_dir) .. " && yarn install --frozen-lockfile"
+			local cmd = "cd " .. vim.fn.shellescape(app_dir) .. " && " .. yarn .. " install --frozen-lockfile"
 			local output = vim.fn.system(cmd)
 
 			if vim.v.shell_error ~= 0 then
@@ -42,24 +43,5 @@ return {
 				desc = "Stop Markdown Preview",
 			},
 		},
-
-		config = function()
-			local plugin_path = vim.fn.stdpath("data") .. "/lazy/markdown-preview.nvim"
-			local build_marker = plugin_path .. "/.mkdp_built"
-
-			if vim.fn.filereadable(build_marker) == 0 then
-				local online = vim.fn.system("ping -c 1 github.com > /dev/null 2>&1 && echo online || echo offline")
-				local has_yarn = vim.fn.executable("yarn") == 1
-
-				if has_yarn and string.find(online, "online") then
-					vim.fn.jobstart({
-						"bash",
-						"-c",
-						"cd " .. plugin_path .. "/app && yarn install --frozen-lockfile && touch " .. build_marker,
-					}, { detach = true })
-				end
-			end
-		end,
 	},
 }
-

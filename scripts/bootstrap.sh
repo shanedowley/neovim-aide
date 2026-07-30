@@ -165,6 +165,9 @@ require_command "nvim" "nvim not found. Install Neovim 0.11+ first."
 require_command "git" "git not found. Install Git first."
 require_command "clang" "clang not found. On macOS run: xcode-select --install. On Linux install clang via your package manager."
 require_command "diff" "diff not found. Install a POSIX-compatible diff utility."
+require_command "node" "node not found. Install Node.js first."
+require_command "npm" "npm not found. Install npm first."
+require_command "npx" "npx not found. Install npm with npx support first."
 
 NVIM_VERSION="$(nvim --version | head -n1)"
 
@@ -179,18 +182,6 @@ if command -v codex >/dev/null 2>&1; then
   ok "codex CLI found: $(codex --version 2>/dev/null || echo unknown)"
 else
   warn "codex CLI not found. AI-assisted workflows will be unavailable."
-fi
-
-if command -v node >/dev/null 2>&1; then
-  ok "node found: $(node --version)"
-else
-  warn "node not found. JavaScript debugging workflows may be degraded."
-fi
-
-if command -v npm >/dev/null 2>&1; then
-  ok "npm found: $(npm --version)"
-else
-  warn "npm not found. vscode-js-debug workflows may be degraded."
 fi
 
 echo
@@ -337,4 +328,3 @@ echo "  4. Visually select some code"
 echo "  5. Press <leader>cE"
 echo
 echo "Neovim-AIDE bootstrap finished."
-
