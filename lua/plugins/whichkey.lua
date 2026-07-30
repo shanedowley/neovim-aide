@@ -91,8 +91,6 @@ return {
 				----------------------------------------------------------------------
 				{ "<leader>f", group = "+file", mode = "n" },
 				{ "<leader>fe", "<cmd>NvimTreeToggle<CR>", desc = "Explorer", mode = "n" },
-				{ "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find file", mode = "n" },
-				{ "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Live grep", mode = "n" },
 				{ "<leader>fr", "<cmd>Telescope oldfiles<CR>", desc = "Recent files", mode = "n" },
 				{ "<leader>fs", "<cmd>w<CR>", desc = "Save file", mode = "n" },
 				{ "<leader>fS", "<cmd>wa<CR>", desc = "Save all", mode = "n" },
@@ -111,10 +109,6 @@ return {
 				-- WINDOWS
 				----------------------------------------------------------------------
 				{ "<leader>w", group = "+window", mode = "n" },
-				{ "<leader>wh", "<C-w>h", desc = "Go left", mode = "n" },
-				{ "<leader>wj", "<C-w>j", desc = "Go down", mode = "n" },
-				{ "<leader>wk", "<C-w>k", desc = "Go up", mode = "n" },
-				{ "<leader>wl", "<C-w>l", desc = "Go right", mode = "n" },
 				{ "<leader>wv", "<cmd>vsplit<CR>", desc = "Vertical split", mode = "n" },
 				{ "<leader>ws", "<cmd>split<CR>", desc = "Horizontal split", mode = "n" },
 				{ "<leader>wq", "<cmd>q<CR>", desc = "Close window", mode = "n" },
@@ -287,50 +281,6 @@ return {
 				-- TEST
 				----------------------------------------------------------------------
 				{ "<leader>t", group = "+test", mode = "n" },
-				{
-					"<leader>tn",
-					function()
-						require("neotest").run.run()
-					end,
-					desc = "Run nearest",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>tf",
-					function()
-						require("neotest").run.run(vim.fn.expand("%"))
-					end,
-					desc = "Run file",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>to",
-					function()
-						require("neotest").output.open({ enter = true })
-					end,
-					desc = "Open output",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
-				{
-					"<leader>ts",
-					function()
-						require("neotest").summary.toggle()
-					end,
-					desc = "Toggle summary",
-					cond = function()
-						return package.loaded["neotest"]
-					end,
-					mode = "n",
-				},
 
 				----------------------------------------------------------------------
 				-- SESSIONS
