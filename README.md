@@ -197,7 +197,7 @@ Complete documentation map.
 
 ## Release History
 
-- `docs/releases/RELEASE_NOTES_RC1_0.md`
+- `docs/releases/RELEASE_NOTES_R1_0.md`
 - `docs/releases/RELEASE_NOTES_R1_1.md`
 - `docs/releases/RELEASE_NOTES_R1_3.md`
 - `docs/releases/RELEASE_NOTES_R1_4.md`
