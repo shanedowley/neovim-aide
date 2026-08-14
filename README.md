@@ -251,8 +251,8 @@ Neovim-AIDE is currently developed and validated on macOS Apple Silicon.
 The agreed release sequence is:
 
 - **R1.6 — Code and documentation cleanup**
-- **R2.0 — Java support**
-- **R3.0 — Provider/model abstraction and OpenRouter**
+- **R2.0 — Intelligent AI orchestration, enabled by provider/model abstraction**
+- **Next major release — Java / multi-language support**
 
 Each release will preserve Neovim-AIDE's human-controlled workflow model and
 build incrementally on the existing architecture.

@@ -51,17 +51,26 @@ future development.
 
 The agreed release sequence is:
 
-## R2.0 — Java Support
+## R2.0 — Intelligent AI Orchestration
 
-R2.0 will extend Neovim-AIDE with Java development support.
+R2.0 will introduce intelligent AI orchestration, with provider/model
+abstraction as its architectural foundation.
 
-Java support should integrate with the existing architecture and preserve the
-project's human-controlled workflow model.
+The product direction has three pillars:
 
-## R3.0 — Provider/Model Abstraction and OpenRouter
+- capability routing — select the model best suited to the task
+- economic routing — use the most economical model expected to complete the
+  task successfully
+- correctness and consistency — preserve predictable Neovim-AIDE behaviour
+  regardless of provider/model selection
 
-R3.0 will introduce provider and model abstraction, including OpenRouter
-integration.
+Provider/model abstraction enables these outcomes; it is not the complete
+product objective.
+
+## Following Major Release — Java / Multi-Language Support
+
+Java support will follow R2.0 as part of the next major release and should
+build on the provider/model abstraction established there.
 
 ---
 

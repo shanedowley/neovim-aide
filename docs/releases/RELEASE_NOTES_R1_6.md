@@ -84,8 +84,8 @@ mappings will need to maintain that functionality in their own configuration.
 
 # Looking Ahead
 
-R1.6 provides the stable cleanup baseline for the planned Java-focused R2.0
-release.
+R1.6 provides the stable cleanup baseline for the planned R2.0 intelligent AI
+orchestration and provider/model abstraction work.
 
 R1.6 reflects the project's preference for small, evidence-based changes that
 improve maintainability without unnecessary behavioural change.

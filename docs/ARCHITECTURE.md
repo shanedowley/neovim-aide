@@ -230,7 +230,7 @@ During workflow execution, operational state temporarily takes precedence over h
 
 The AI execution subsystem delegates model interaction to **Codex CLI**, the execution backend shipped with the current release.
 
-Execution is coordinated through focused runtime modules so that provider-specific concerns remain contained as far as the current architecture permits. A formal provider and model abstraction is reserved for a future release.
+Execution is coordinated through focused runtime modules so that provider-specific concerns remain contained as far as the current architecture permits. A formal provider/model abstraction is planned for R2.0 as the architectural foundation for intelligent AI orchestration.
 
 Responsibilities include:
 
