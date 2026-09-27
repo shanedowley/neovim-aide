@@ -48,7 +48,7 @@ vim.o.guicursor = table.concat({
 -- ──────────────────────────────────────────────
 if vim.g.neovide then
 	-- Font and UI scaling
-	vim.o.guifont = "FiraCode Nerd Font Mono:h14"
+	vim.o.guifont = "JetBrainsMono Nerd Font Mono:h14"
 	vim.g.neovide_scale_factor = 1.0
 
 	-- Cursor animations
