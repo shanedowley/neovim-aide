@@ -1,7 +1,7 @@
 local M = {}
 
 local config = {
-	model = "gpt-5.4-mini",
+	model = "gpt-5.6-luna",
 	-- --------------------------------------------------
 	-- Test / Fault Injection
 	-- --------------------------------------------------
@@ -21,10 +21,10 @@ local config = {
 		default_mode = "fast",
 
 		model_profiles = {
-			fast = "gpt-5.4-mini",
-			balanced = "gpt-5.4-mini",
-			strict = "gpt-5.4-mini",
-			refactor = "gpt-5.4-mini",
+			fast = "gpt-5.6-luna",
+			balanced = "gpt-5.6-luna",
+			strict = "gpt-5.6-luna",
+			refactor = "gpt-5.6-luna",
 		},
 	},
 }
