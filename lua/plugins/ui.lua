@@ -4,6 +4,7 @@ return {
 		event = "VeryLazy",
 		config = function()
 			require("neoscroll").setup({
+				duration_multiplier = 0.75,
 				easing_function = "sine",
 				hide_cursor = false,
 				respect_scrolloff = true,
