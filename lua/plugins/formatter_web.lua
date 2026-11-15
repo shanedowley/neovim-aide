@@ -42,6 +42,14 @@ return {
 
         -- Format on save for common text-ish files; you can expand this
         format_on_save = function(bufnr)
+          -- Preserve source formatting during the emmadowley.com migration.
+          local filename = vim.api.nvim_buf_get_name(bufnr)
+          local project_root = vim.fn.expand("~/Projects/emmadowley") .. "/"
+
+          if filename:sub(1, #project_root) == project_root then
+            return false
+          end
+
           local ft = vim.bo[bufnr].filetype
           local enable = vim.tbl_contains({
             "lua","c","cpp",
