@@ -131,6 +131,24 @@ end
 function M.run(opts)
 	opts = opts or {}
 
+	-- Copy only attribution fields before scheduling or opening output.
+	local captured_metadata
+	if opts.captured_metadata then
+		captured_metadata = {
+			file = opts.captured_metadata.file,
+			mode = opts.captured_metadata.mode,
+			prompt_version = opts.captured_metadata.prompt_version,
+		}
+	end
+
+	local function running_identity()
+		if captured_metadata then
+			return captured_metadata.mode, captured_metadata.file
+		end
+
+		return require("codex_mode").current(), vim.api.nvim_buf_get_name(0)
+	end
+
 	local request_id = next_request_id()
 	opts.request_id = request_id
 
@@ -188,10 +206,11 @@ function M.run(opts)
 			)
 
 			pcall(function()
+				local request_mode, request_file = running_identity()
 				require("codex.state").set("running", {
 					op = op,
-					mode = require("codex_mode").current(),
-					file = vim.api.nvim_buf_get_name(0),
+					mode = request_mode,
+					file = request_file,
 					message = "Running Codex request",
 				})
 			end)
@@ -218,10 +237,11 @@ function M.run(opts)
 				health_state.set("ready", "✓ Codex Ready")
 
 				pcall(function()
+					local request_mode, request_file = running_identity()
 					require("codex.state").set("running", {
 						op = op,
-						mode = require("codex_mode").current(),
-						file = vim.api.nvim_buf_get_name(0),
+						mode = request_mode,
+						file = request_file,
 						message = "Running Codex request",
 					})
 				end)
@@ -280,7 +300,8 @@ function M.run(opts)
 			})
 		)
 
-		local argv = codex_cli.build_exec_argv(prompt_text)
+		local argv = codex_cli.build_exec_argv(prompt_text, captured_metadata and captured_metadata.mode or nil)
+
 		local job_id = vim.fn.jobstart(argv, {
 			pty = opts.pty or false,
 			env = opts.env,
@@ -565,4 +586,3 @@ function M.run_embedded(input, instruction, opts)
 end
 
 return M
-

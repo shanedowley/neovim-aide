@@ -190,27 +190,38 @@ local function maybe_with_context(body)
 	return ctx .. "\n\n" .. body
 end
 
-function M.build_explain(ft, scope)
+function M.build_explain(ft, scope, captured_policy)
 	ft = ft or ""
 	scope = scope or "selection"
+
+	local function finish(rendered)
+		if captured_policy then
+			return table.concat({
+				("PROMPT_VERSION: %s"):format(captured_policy.prompt_version),
+				("PROMPT_MODE: %s"):format(captured_policy.mode),
+				"",
+				rendered,
+			}, "\n") .. captured_policy.explain_suffix
+		end
+
+		local base = with_header(rendered)
+		local profile = mode.get()
+		return base .. (profile.explain_suffix or "")
+	end
 
 	if M.is_c_family(ft) then
 		local template = store.get("explain_c")
 		local rendered = substitute(template, {
 			subject = explain_subject(ft, scope),
 		})
-		local base = with_header(rendered)
-		local profile = mode.get()
-		return base .. (profile.explain_suffix or "")
+		return finish(rendered)
 	end
 
 	local template = store.get("explain_generic")
 	local rendered = substitute(template, {
 		subject = explain_subject(ft, scope),
 	})
-	local base = with_header(rendered)
-	local profile = mode.get()
-	return base .. (profile.explain_suffix or "")
+	return finish(rendered)
 end
 
 function M.build_explain_fast(ft, scope)

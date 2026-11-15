@@ -62,20 +62,42 @@ local function set_state_applied(op_name, bufnr, message)
 	})
 end
 
-local function set_state_failed(op_name, bufnr, message)
+local function set_state_failed(op_name, bufnr, message, captured_metadata)
+	local file
+	local current_mode
+
+	if captured_metadata then
+		file = captured_metadata.file
+		current_mode = captured_metadata.mode
+	else
+		file = current_file(bufnr)
+		current_mode = mode.current()
+	end
+
 	state.set("failed", {
 		op = op_name,
-		mode = mode.current(),
-		file = current_file(bufnr),
+		mode = current_mode,
+		file = file,
 		message = message or "Codex operation failed",
 	})
 end
 
-local function set_state_complete(op_name, bufnr, message)
+local function set_state_complete(op_name, bufnr, message, captured_metadata)
+	local file
+	local current_mode
+
+	if captured_metadata then
+		file = captured_metadata.file
+		current_mode = captured_metadata.mode
+	else
+		file = current_file(bufnr)
+		current_mode = mode.current()
+	end
+
 	state.set("complete", {
 		op = op_name,
-		mode = mode.current(),
-		file = current_file(bufnr),
+		mode = current_mode,
+		file = file,
 		message = message or "Codex operation complete",
 	})
 end
@@ -184,10 +206,21 @@ local function sanitize_prompt_for_log(text)
 	return text
 end
 
-local function remember_and_log_op(op_name, user_prompt)
-	local file = current_file(0)
-	local current_mode = mode.current()
-	local prompt_version = prompt.version and prompt.version() or "unknown"
+local function remember_and_log_op(op_name, user_prompt, captured_metadata)
+	local file
+	local current_mode
+	local prompt_version
+
+	if captured_metadata then
+		file = captured_metadata.file
+		current_mode = captured_metadata.mode
+		prompt_version = captured_metadata.prompt_version
+	else
+		file = current_file(0)
+		current_mode = mode.current()
+		prompt_version = prompt.version and prompt.version() or "unknown"
+	end
+
 	local cleaned_prompt = sanitize_prompt_for_log(user_prompt)
 
 	memory.save_last_op({
@@ -724,53 +757,76 @@ function M.explain_current_line()
 end
 
 function M.explain_current_buffer()
-	local bufnr = vim.api.nvim_get_current_buf()
-	local buftype = vim.bo[bufnr].buftype
+	local context = require("codex.context")
+	local source, capture_error = context.capture_source(vim.api.nvim_get_current_buf())
 
-	if buftype ~= "" then
-		vim.notify("Current buffer cannot be explained", vim.log.levels.WARN, { title = "Codex" })
+	if not source then
+		vim.notify(capture_error.message, vim.log.levels.WARN, {
+			title = "Codex",
+		})
 		return
 	end
 
-	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-	local text = table.concat(lines, "\n")
+	local captured_mode = mode.current()
+	local captured_prompt_version = prompt.version()
+	local captured_suffix = mode.profile(captured_mode).explain_suffix or ""
 
-	if vim.trim(text) == "" then
-		vim.notify("Current buffer is empty", vim.log.levels.WARN, { title = "Codex" })
-		return
-	end
+	local request = {
+		operation = "explain_current_buffer",
+		captured_at = source.captured_at,
+		source = source,
+		metadata = {
+			file = source.path,
+			mode = captured_mode,
+			prompt_version = captured_prompt_version,
+		},
+	}
 
-	local ft = vim.bo[bufnr].filetype or ""
-	local buffer_name = vim.api.nvim_buf_get_name(bufnr)
-
-	if buffer_name == "" then
-		buffer_name = "[No Name]"
-	else
-		buffer_name = vim.fn.fnamemodify(buffer_name, ":t")
-	end
-
-	local op_name = "explain_current_buffer"
+	-- Freeze prompt policy before Git lookup can process editor events.
 	local user_prompt = table.concat({
-		prompt.build_explain(ft, "buffer"),
+		prompt.build_explain(source.filetype, "buffer", {
+			mode = captured_mode,
+			prompt_version = captured_prompt_version,
+			explain_suffix = captured_suffix,
+		}),
 		"",
 		"Context:",
-		"- Buffer: " .. buffer_name,
-		"- Filetype: " .. (ft ~= "" and ft or "text"),
+		"- Buffer: " .. vim.fn.fnamemodify(source.path, ":t"),
+		"- Filetype: " .. (source.filetype ~= "" and source.filetype or "text"),
 		"- The supplied input is the complete current Neovim buffer, including unsaved changes.",
 	}, "\n")
 
-	remember_and_log_op(op_name, user_prompt)
+	local repository, repository_error = context.resolve_worktree(source)
+	if not repository then
+		local message = repository_error.message
+		if repository_error.details and repository_error.details ~= "" then
+			message = message .. "\n" .. repository_error.details
+		end
+		vim.notify(message, vim.log.levels.ERROR, {
+			title = "Codex",
+		})
+		return
+	end
 
-	runner.run_embedded(text, user_prompt, {
-		op = op_name,
-		filetype = ft,
-		spinner_message = ui.phase_message(op_name, "running"),
+	request.repository = repository
+
+	remember_and_log_op(request.operation, user_prompt, request.metadata)
+
+	runner.run_embedded(source.text, user_prompt, {
+		op = request.operation,
+		filetype = source.filetype,
+		captured_metadata = {
+			file = request.metadata.file,
+			mode = request.metadata.mode,
+			prompt_version = request.metadata.prompt_version,
+		},
+		spinner_message = ui.phase_message(request.operation, "running"),
 		stream_output = true,
 		on_success = function(_)
-			set_state_complete(op_name, bufnr, "Buffer explanation opened")
+			set_state_complete(request.operation, request.source.bufnr, "Buffer explanation opened", request.metadata)
 		end,
 		on_failure = function(result)
-			set_state_failed(op_name, bufnr, "Codex execution failed")
+			set_state_failed(request.operation, request.source.bufnr, "Codex execution failed", request.metadata)
 			if #result.stderr > 0 then
 				open_scratch(result.stderr, "text", "Codex STDERR")
 			end
