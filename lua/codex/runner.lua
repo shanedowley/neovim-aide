@@ -131,6 +131,10 @@ end
 function M.run(opts)
 	opts = opts or {}
 
+	local execution_directory = opts.execution_directory
+	local validate_execution_directory = opts.validate_execution_directory
+	local has_execution_directory = execution_directory ~= nil or validate_execution_directory ~= nil
+
 	-- Copy only attribution fields before scheduling or opening output.
 	local captured_metadata
 	if opts.captured_metadata then
@@ -159,14 +163,94 @@ function M.run(opts)
 	local stream_output = opts.stream_output == true
 	local stream_bufnr = nil
 
+	local execution_directory_failed = false
+
+	local function fail_execution_directory(reason, message)
+		if execution_directory_failed then
+			return
+		end
+		execution_directory_failed = true
+
+		local request_mode, request_file = running_identity()
+		local stage = "execution_directory_validation"
+
+		log_event(
+			"fail",
+			with_request(opts, {
+				op = op,
+				stage = stage,
+				reason = reason,
+				message = message,
+				mode = request_mode,
+				file = request_file,
+				prompt_version = captured_metadata and captured_metadata.prompt_version or nil,
+			})
+		)
+
+		pcall(function()
+			require("codex.state").set("failed", {
+				op = op,
+				mode = request_mode,
+				file = request_file,
+				message = message,
+			})
+		end)
+
+		ui.stop(message, vim.log.levels.ERROR)
+
+		if stream_output then
+			if not stream_bufnr then
+				stream_bufnr = output.open({
+					title = "Codex " .. op,
+					filetype = "markdown",
+				})
+			end
+			output.fail(stream_bufnr, { message })
+		end
+
+		if opts.on_failure then
+			opts.on_failure({
+				code = -1,
+				stdout = {},
+				stderr = { message },
+				output = { message },
+				latency_ms = 0,
+				op = op,
+				request_id = request_id,
+				stage = stage,
+				reason = reason,
+				mode = request_mode,
+				file = request_file,
+				prompt_version = captured_metadata and captured_metadata.prompt_version or nil,
+			})
+		end
+	end
+
 	ui.start(spinner_message)
+
+	if has_execution_directory then
+		if
+			type(execution_directory) ~= "string"
+			or execution_directory:sub(1, 1) ~= "/"
+			or execution_directory:find("[\r\n%z]")
+			or type(validate_execution_directory) ~= "function"
+		then
+			fail_execution_directory(
+				"invalid_execution_directory_options",
+				"Codex requires an absolute execution directory and its validator together."
+			)
+			return
+		end
+	end
 
 	if stream_output then
 		vim.schedule(function()
-			stream_bufnr = output.open({
-				title = "Codex " .. op,
-				filetype = "markdown",
-			})
+			if not stream_bufnr then
+				stream_bufnr = output.open({
+					title = "Codex " .. op,
+					filetype = "markdown",
+				})
+			end
 		end)
 	end
 
@@ -302,7 +386,45 @@ function M.run(opts)
 
 		local argv = codex_cli.build_exec_argv(prompt_text, captured_metadata and captured_metadata.mode or nil)
 
+		if has_execution_directory then
+			local validated, result, validation_error = pcall(validate_execution_directory, execution_directory)
+
+			if not validated then
+				fail_execution_directory(
+					"execution_directory_validator_error",
+					"Codex execution-directory validation errored: " .. tostring(result)
+				)
+				return
+			end
+
+			if result == nil then
+				local reason = "execution_directory_rejected"
+				local message = "Codex execution-directory validation failed."
+
+				if type(validation_error) == "table" then
+					if type(validation_error.code) == "string" then
+						reason = validation_error.code
+					end
+					if type(validation_error.message) == "string" and validation_error.message ~= "" then
+						message = validation_error.message
+					end
+				end
+
+				fail_execution_directory(reason, message)
+				return
+			end
+
+			if type(result) ~= "table" or result.directory ~= execution_directory then
+				fail_execution_directory(
+					"invalid_execution_directory_result",
+					"Codex execution-directory validator returned an invalid or different directory."
+				)
+				return
+			end
+		end
+
 		local job_id = vim.fn.jobstart(argv, {
+			cwd = execution_directory,
 			pty = opts.pty or false,
 			env = opts.env,
 			stdout_buffered = false,

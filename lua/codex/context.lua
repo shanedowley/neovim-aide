@@ -290,6 +290,308 @@ function M.resolve_worktree(source)
 	}
 end
 
+-- Execution-location identity is deliberately limited to canonical POSIX paths
+-- and filesystem identifiers that Lua numbers can represent exactly.
+local function execution_identity_number(value)
+	return type(value) == "number" and value >= 0 and value <= 9007199254740991 and value == math.floor(value)
+end
+
+local function execution_directory_identity(path)
+	local uv = vim.uv or vim.loop
+
+	if type(path) ~= "string" or path:sub(1, 1) ~= "/" or path:find("[\r\n%z]") then
+		return resolution_error(
+			"invalid_execution_location",
+			"Execution location requires an absolute POSIX directory path."
+		)
+	end
+
+	local canonical, path_error = uv.fs_realpath(path)
+	if not canonical then
+		return resolution_error(
+			"execution_directory_unavailable",
+			"Execution-location directory is missing or inaccessible.",
+			path_error
+		)
+	end
+
+	if canonical ~= path then
+		return resolution_error(
+			"execution_path_changed",
+			"Execution-location path no longer resolves to its captured location.",
+			path
+		)
+	end
+
+	local stat, stat_error = uv.fs_stat(path)
+	if not stat or stat.type ~= "directory" then
+		return resolution_error(
+			"execution_directory_unavailable",
+			"Execution location is not an accessible directory.",
+			stat_error or path
+		)
+	end
+
+	if not execution_identity_number(stat.dev) or not execution_identity_number(stat.ino) or stat.ino == 0 then
+		return resolution_error(
+			"execution_identity_unsupported",
+			"Filesystem device/inode identity cannot be verified reliably.",
+			path
+		)
+	end
+
+	return {
+		path = path,
+		dev = stat.dev,
+		ino = stat.ino,
+	}
+end
+
+local function match_execution_directory(expected)
+	if
+		type(expected) ~= "table"
+		or not execution_identity_number(expected.dev)
+		or not execution_identity_number(expected.ino)
+		or expected.ino == 0
+	then
+		return resolution_error("invalid_execution_location", "Captured execution-location identity is invalid.")
+	end
+
+	local current, identity_error = execution_directory_identity(expected.path)
+	if not current then
+		return nil, identity_error
+	end
+
+	if current.dev ~= expected.dev or current.ino ~= expected.ino then
+		return resolution_error(
+			"execution_identity_changed",
+			"Execution-location directory was replaced.",
+			expected.path
+		)
+	end
+
+	return true
+end
+
+local function execution_git_binding(directory)
+	local uv = vim.uv or vim.loop
+
+	if type(vim.system) ~= "function" then
+		return resolution_error("git_unavailable", "Execution-location lookup requires vim.system().")
+	end
+
+	local git_env = {}
+	for key, value in pairs(vim.fn.environ()) do
+		if not key:match("^GIT_") then
+			git_env[key] = value
+		end
+	end
+	git_env.LC_ALL = "C"
+
+	local started = uv.hrtime()
+	local ok, process = pcall(vim.system, {
+		"git",
+		"--no-optional-locks",
+		"-C",
+		directory,
+		"rev-parse",
+		"--is-inside-work-tree",
+		"--show-toplevel",
+		"--absolute-git-dir",
+	}, {
+		env = git_env,
+		clear_env = true,
+	})
+
+	if not ok then
+		return resolution_error(
+			"git_lookup_failed",
+			"Could not start execution-location Git lookup.",
+			tostring(process)
+		)
+	end
+
+	local remaining = math.floor(1000 - (uv.hrtime() - started) / 1e6)
+	if remaining <= 0 then
+		pcall(function()
+			process:kill(9)
+		end)
+		return resolution_error("git_timeout", "Execution-location Git lookup exceeded its one-second budget.")
+	end
+
+	local waited, result = pcall(function()
+		return process:wait(remaining)
+	end)
+
+	if not waited then
+		pcall(function()
+			process:kill(9)
+		end)
+		return resolution_error(
+			"git_lookup_failed",
+			"Could not collect execution-location Git results.",
+			tostring(result)
+		)
+	end
+
+	if type(result) ~= "table" or type(result.code) ~= "number" then
+		return resolution_error("git_lookup_failed", "Git returned an invalid process result.")
+	end
+
+	if result.code == 124 or (uv.hrtime() - started) / 1e6 >= 1000 then
+		return resolution_error("git_timeout", "Execution-location Git lookup exceeded its one-second budget.")
+	end
+
+	if result.code ~= 0 then
+		return resolution_error("git_lookup_failed", "Execution-location Git lookup failed.", result.stderr)
+	end
+
+	if type(result.stdout) ~= "string" then
+		return resolution_error("invalid_git_result", "Git returned no execution-location information.")
+	end
+
+	local lines = vim.split(result.stdout:gsub("\n$", ""), "\n", { plain = true })
+
+	if
+		#lines ~= 3
+		or lines[1] ~= "true"
+		or not single_output_line(lines[2])
+		or not single_output_line(lines[3])
+		or lines[2]:sub(1, 1) ~= "/"
+		or lines[3]:sub(1, 1) ~= "/"
+	then
+		return resolution_error(
+			"invalid_git_result",
+			"Git returned invalid or ambiguous execution-location information."
+		)
+	end
+
+	local worktree_root = uv.fs_realpath(lines[2])
+	local git_directory = uv.fs_realpath(lines[3])
+	if not worktree_root or not git_directory then
+		return resolution_error("invalid_git_result", "Git worktree or per-worktree Git directory cannot be resolved.")
+	end
+
+	return {
+		worktree_root = worktree_root,
+		git_directory = git_directory,
+	}
+end
+
+local function check_execution_directories(location)
+	-- Check execution_directory last, including after Git lookup.
+	for _, key in ipairs({
+		"worktree_root",
+		"git_directory",
+		"execution_directory",
+	}) do
+		local matches, identity_error = match_execution_directory(location[key])
+		if not matches then
+			return nil, identity_error
+		end
+	end
+
+	return true
+end
+
+function M.capture_execution_location(repository)
+	if
+		type(repository) ~= "table"
+		or type(repository.resolved_path) ~= "string"
+		or repository.resolved_path:sub(1, 1) ~= "/"
+		or repository.resolved_path:find("[\r\n%z]")
+	then
+		return resolution_error(
+			"invalid_execution_location",
+			"Execution-location capture requires a resolved source identity."
+		)
+	end
+
+	local directory, directory_error = execution_directory_identity(parent_dir(repository.resolved_path))
+	if not directory then
+		return nil, directory_error
+	end
+
+	local worktree, worktree_error = execution_directory_identity(repository.worktree_root)
+	if not worktree then
+		return nil, worktree_error
+	end
+
+	local prefix = worktree.path == "/" and "/" or worktree.path .. "/"
+	if directory.path ~= worktree.path and directory.path:sub(1, #prefix) ~= prefix then
+		return resolution_error("source_outside_worktree", "Execution directory is outside the captured Git worktree.")
+	end
+
+	local binding, binding_error = execution_git_binding(directory.path)
+	if not binding then
+		return nil, binding_error
+	end
+
+	if binding.worktree_root ~= worktree.path then
+		return resolution_error(
+			"execution_worktree_changed",
+			"Git no longer associates the execution directory with the captured worktree."
+		)
+	end
+
+	local git_directory, git_error = execution_directory_identity(binding.git_directory)
+	if not git_directory then
+		return nil, git_error
+	end
+
+	local location = {
+		execution_directory = directory,
+		worktree_root = worktree,
+		git_directory = git_directory,
+	}
+
+	local consistent, consistency_error = check_execution_directories(location)
+	if not consistent then
+		return nil, consistency_error
+	end
+
+	return location
+end
+
+function M.validate_execution_location(location)
+	if type(location) ~= "table" then
+		return resolution_error("invalid_execution_location", "Captured execution location is missing or invalid.")
+	end
+
+	local consistent, consistency_error = check_execution_directories(location)
+	if not consistent then
+		return nil, consistency_error
+	end
+
+	local binding, binding_error = execution_git_binding(location.execution_directory.path)
+	if not binding then
+		return nil, binding_error
+	end
+
+	if binding.worktree_root ~= location.worktree_root.path then
+		return resolution_error(
+			"execution_worktree_changed",
+			"Execution directory now belongs to a different Git worktree."
+		)
+	end
+
+	if binding.git_directory ~= location.git_directory.path then
+		return resolution_error(
+			"execution_git_directory_changed",
+			"Execution directory now uses a different per-worktree Git directory."
+		)
+	end
+
+	local unchanged, final_error = check_execution_directories(location)
+	if not unchanged then
+		return nil, final_error
+	end
+
+	return {
+		directory = location.execution_directory.path,
+	}
+end
+
 local function marker_type(name)
 	if name == ".git" then
 		return "directory"

@@ -810,11 +810,38 @@ function M.explain_current_buffer()
 
 	request.repository = repository
 
+	local execution_location, execution_error = context.capture_execution_location(repository)
+	if not execution_location then
+		local message = execution_error.message
+		if execution_error.details and execution_error.details ~= "" then
+			message = message .. "\n" .. execution_error.details
+		end
+		vim.notify(message, vim.log.levels.ERROR, {
+			title = "Codex",
+		})
+		return
+	end
+
+	local execution_directory = execution_location.execution_directory.path
+	local validate_execution_location = context.validate_execution_location
+
 	remember_and_log_op(request.operation, user_prompt, request.metadata)
 
 	runner.run_embedded(source.text, user_prompt, {
 		op = request.operation,
 		filetype = source.filetype,
+		execution_directory = execution_directory,
+		validate_execution_directory = function(directory)
+			if directory ~= execution_directory then
+				return nil,
+					{
+						code = "invalid_execution_location",
+						message = "Execution directory differs from the captured request.",
+					}
+			end
+
+			return validate_execution_location(execution_location)
+		end,
 		captured_metadata = {
 			file = request.metadata.file,
 			mode = request.metadata.mode,
