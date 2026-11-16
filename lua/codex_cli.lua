@@ -1,6 +1,9 @@
 -- ~/.config/nvim/lua/codex_cli.lua
 local M = {} -- module table
 
+-- Latest submitted current-buffer Explain inputs; session-local, never persisted.
+local latest_explain_request = nil
+
 local parse = require("codex_parse")
 local prompt = require("codex_prompt")
 local mode = require("codex_mode")
@@ -770,11 +773,13 @@ function M.explain_current_buffer()
 	local captured_mode = mode.current()
 	local captured_prompt_version = prompt.version()
 	local captured_suffix = mode.profile(captured_mode).explain_suffix or ""
+	local captured_context_enabled = context.enabled()
 
 	local request = {
 		operation = "explain_current_buffer",
 		captured_at = source.captured_at,
 		source = source,
+		context_enabled = captured_context_enabled,
 		metadata = {
 			file = source.path,
 			mode = captured_mode,
@@ -796,6 +801,7 @@ function M.explain_current_buffer()
 		"- The supplied input is the complete current Neovim buffer, including unsaved changes.",
 	}, "\n")
 
+	local spinner_message = ui.phase_message(request.operation, "running")
 	local repository, repository_error = context.resolve_worktree(source)
 	if not repository then
 		local message = repository_error.message
@@ -825,40 +831,332 @@ function M.explain_current_buffer()
 	local execution_directory = execution_location.execution_directory.path
 	local validate_execution_location = context.validate_execution_location
 
-	remember_and_log_op(request.operation, user_prompt, request.metadata)
+	local capture_document = context.capture_document
+	local render_supplement = prompt.render_explain_supplement
+	local document_options = {
+		-- Add any known configured native Codex instruction fallback filenames.
+		native_instruction_filenames = {},
+	}
 
-	runner.run_embedded(source.text, user_prompt, {
-		op = request.operation,
-		filetype = source.filetype,
-		execution_directory = execution_directory,
-		validate_execution_directory = function(directory)
-			if directory ~= execution_directory then
-				return nil,
-					{
-						code = "invalid_execution_location",
-						message = "Execution directory differs from the captured request.",
-					}
+	request.baseline_instruction = user_prompt
+	request.submitted_instruction = user_prompt
+	request.supplement_status = request.context_enabled and "not_selected" or "disabled"
+
+	local phase = "ready"
+	local selection_generation = 0
+
+	local function submit()
+		if phase ~= "ready" then
+			return
+		end
+		phase = "submitted"
+
+		remember_and_log_op(request.operation, user_prompt, request.metadata)
+
+		local submitted_at = os.time()
+		local document = request.document
+		local omission = request.document_omission
+
+		local inspection_record = {
+			payload = {
+				operation = request.operation,
+				captured_at = request.captured_at,
+				submitted_at = submitted_at,
+				context_enabled = request.context_enabled,
+
+				source = {
+					bufnr = source.bufnr,
+					path = source.path,
+					filetype = source.filetype,
+					changedtick = source.changedtick,
+					modified = source.modified,
+					captured_at = source.captured_at,
+					text = source.text,
+				},
+
+				prompt_policy = {
+					mode = request.metadata.mode,
+					prompt_version = request.metadata.prompt_version,
+					explain_suffix = captured_suffix,
+				},
+
+				baseline_instruction = request.baseline_instruction,
+				submitted_instruction = request.submitted_instruction,
+
+				repository = {
+					editor_path = request.repository.editor_path,
+					resolved_path = request.repository.resolved_path,
+					worktree_root = request.repository.worktree_root,
+					relative_file = request.repository.relative_file,
+					lookup_ms = request.repository.lookup_ms,
+				},
+
+				execution_location = {
+					execution_directory = {
+						path = execution_location.execution_directory.path,
+						dev = execution_location.execution_directory.dev,
+						ino = execution_location.execution_directory.ino,
+					},
+					worktree_root = {
+						path = execution_location.worktree_root.path,
+						dev = execution_location.worktree_root.dev,
+						ino = execution_location.worktree_root.ino,
+					},
+					git_directory = {
+						path = execution_location.git_directory.path,
+						dev = execution_location.git_directory.dev,
+						ino = execution_location.git_directory.ino,
+					},
+				},
+
+				supplement_status = request.supplement_status,
+				selected_document_path = request.selected_document_path,
+
+				document = document and {
+					status = document.status,
+					selected_path = document.selected_path,
+					resolved_path = document.resolved_path,
+					worktree_root = document.worktree_root,
+					relative_file = document.relative_file,
+					text = document.text,
+					sha256 = document.sha256,
+					byte_count = document.byte_count,
+					read_bytes = document.read_bytes,
+					supplied_bytes = document.supplied_bytes,
+					limit_bytes = document.limit_bytes,
+					captured_at = document.captured_at,
+					preparation_ms = document.preparation_ms,
+				} or nil,
+
+				document_omission = omission and {
+					status = omission.status,
+					code = omission.code,
+					message = omission.message,
+					selected_path = omission.selected_path,
+					resolved_path = omission.resolved_path,
+					observed_size = omission.observed_size,
+					read_bytes = omission.read_bytes,
+					supplied_bytes = omission.supplied_bytes,
+					limit_bytes = omission.limit_bytes,
+					captured_at = omission.captured_at,
+					preparation_ms = omission.preparation_ms,
+				} or nil,
+			},
+
+			outcome = {
+				status = "submission_requested",
+				observed_at = submitted_at,
+			},
+		}
+
+		latest_explain_request = inspection_record
+
+		runner.run_embedded(source.text, request.submitted_instruction, {
+			recovery_metadata_only = request.supplement_status == "included" and true or nil,
+			op = request.operation,
+			filetype = source.filetype,
+			execution_directory = execution_directory,
+			validate_execution_directory = function(directory)
+				if directory ~= execution_directory then
+					return nil,
+						{
+							code = "invalid_execution_location",
+							message = "Execution directory differs from the captured request.",
+						}
+				end
+
+				return validate_execution_location(execution_location)
+			end,
+			captured_metadata = {
+				file = request.metadata.file,
+				mode = request.metadata.mode,
+				prompt_version = request.metadata.prompt_version,
+			},
+			spinner_message = spinner_message,
+			stream_output = true,
+			on_success = function(_)
+				inspection_record.outcome = {
+					status = "completed",
+					observed_at = os.time(),
+				}
+				set_state_complete(
+					request.operation,
+					request.source.bufnr,
+					"Buffer explanation opened",
+					request.metadata
+				)
+			end,
+			on_failure = function(result)
+				inspection_record.outcome = {
+					status = "failed",
+					observed_at = os.time(),
+					code = result.code,
+					stage = result.stage,
+				}
+				set_state_failed(request.operation, request.source.bufnr, "Codex execution failed", request.metadata)
+				if #result.stderr > 0 then
+					open_scratch(result.stderr, "text", "Codex STDERR")
+				end
+			end,
+		})
+	end
+	local function prepare_document(answer)
+		request.selected_document_path = type(answer) == "string" and answer or nil
+
+		local function omit(record)
+			request.document_omission = record
+			request.supplement_status = "omitted"
+			request.submitted_instruction = request.baseline_instruction
+			vim.notify(
+				"Supplementary document omitted: " .. record.message .. " Explain will continue without it.",
+				vim.log.levels.WARN,
+				{ title = "Codex" }
+			)
+		end
+
+		if type(answer) ~= "string" or answer == "" then
+			omit({
+				status = "omitted",
+				code = "invalid_document_path",
+				message = "No valid repository-relative document path was supplied.",
+				selected_path = request.selected_document_path,
+				supplied_bytes = 0,
+			})
+			return
+		end
+
+		local captured, document, omission = pcall(capture_document, request.repository, answer, document_options)
+
+		if not captured then
+			omit({
+				status = "omitted",
+				code = "document_capture_failed",
+				message = "Supplementary document capture encountered an error.",
+				selected_path = answer,
+				supplied_bytes = 0,
+			})
+			return
+		end
+
+		if document == nil then
+			if type(omission) == "table" and type(omission.message) == "string" then
+				omit(omission)
+			else
+				omit({
+					status = "omitted",
+					code = "invalid_document_capture",
+					message = "Supplementary document capture returned an invalid result.",
+					selected_path = answer,
+					supplied_bytes = 0,
+				})
+			end
+			return
+		end
+
+		if type(document) ~= "table" or document.status ~= "included" then
+			omit({
+				status = "omitted",
+				code = "invalid_document_capture",
+				message = "Supplementary document capture returned an invalid result.",
+				selected_path = answer,
+				supplied_bytes = 0,
+			})
+			return
+		end
+
+		request.document = document
+
+		local rendered, section = pcall(render_supplement, document, request.context_enabled)
+		if not rendered or type(section) ~= "string" or section == "" then
+			omit({
+				status = "omitted",
+				code = "document_render_failed",
+				message = "Supplementary document context could not be rendered.",
+				selected_path = answer,
+				resolved_path = document.resolved_path,
+				supplied_bytes = 0,
+			})
+			return
+		end
+
+		request.supplement_section = section
+		request.submitted_instruction = request.baseline_instruction .. "\n\n" .. section
+		request.supplement_status = "included"
+	end
+
+	local choices = {
+		"Explain without supplementary document",
+		"Select one supplementary document",
+	}
+
+	local show_choice
+	show_choice = function()
+		if phase ~= "ready" and phase ~= "returning" then
+			return
+		end
+
+		phase = "choosing"
+		selection_generation = selection_generation + 1
+		local generation = selection_generation
+
+		vim.ui.select(choices, {
+			prompt = "Explain captured buffer:",
+		}, function(choice)
+			if phase ~= "choosing" or generation ~= selection_generation then
+				return
 			end
 
-			return validate_execution_location(execution_location)
-		end,
-		captured_metadata = {
-			file = request.metadata.file,
-			mode = request.metadata.mode,
-			prompt_version = request.metadata.prompt_version,
-		},
-		spinner_message = ui.phase_message(request.operation, "running"),
-		stream_output = true,
-		on_success = function(_)
-			set_state_complete(request.operation, request.source.bufnr, "Buffer explanation opened", request.metadata)
-		end,
-		on_failure = function(result)
-			set_state_failed(request.operation, request.source.bufnr, "Codex execution failed", request.metadata)
-			if #result.stderr > 0 then
-				open_scratch(result.stderr, "text", "Codex STDERR")
+			if choice == nil then
+				phase = "cancelled"
+				return
 			end
-		end,
-	})
+
+			if choice == choices[1] then
+				phase = "ready"
+				submit()
+				return
+			end
+
+			if choice ~= choices[2] then
+				phase = "cancelled"
+				vim.notify("Explain cancelled: unrecognised selection.", vim.log.levels.WARN, {
+					title = "Codex",
+				})
+				return
+			end
+
+			phase = "entering"
+			vim.ui.input({
+				prompt = "Supplementary document path (relative to captured Git worktree): ",
+			}, function(answer)
+				if phase ~= "entering" or generation ~= selection_generation then
+					return
+				end
+
+				if answer == nil then
+					phase = "returning"
+					vim.schedule(function()
+						if phase == "returning" and generation == selection_generation then
+							show_choice()
+						end
+					end)
+					return
+				end
+
+				phase = "preparing"
+				prepare_document(answer)
+
+				phase = "ready"
+				submit()
+			end)
+		end)
+	end
+
+	if request.context_enabled then
+		show_choice()
+	else
+		submit()
+	end
 end
 
 function M.explain_text(text)
@@ -1818,6 +2116,210 @@ function M.show_commands()
 	open_scratch(lines, "markdown", "Commands")
 end
 
+function M.show_explain_context()
+	local record = latest_explain_request
+	if not record then
+		vim.notify("No current-buffer Explain request has been submitted in this session.", vim.log.levels.INFO, {
+			title = "Codex",
+		})
+		return
+	end
+
+	-- Payload is privately owned and never modified after submission.
+	-- Copy outcome so this explicit refresh has one callback-observed status.
+	local payload = record.payload
+	local outcome = vim.deepcopy(record.outcome)
+
+	local function metadata_without_text(value)
+		if not value then
+			return nil
+		end
+		local metadata = {}
+		for key, item in pairs(value) do
+			if key ~= "text" then
+				metadata[key] = item
+			end
+		end
+		return metadata
+	end
+
+	local sections = {
+		{
+			name = "Submitted instruction supplied to run_embedded",
+			text = payload.submitted_instruction,
+		},
+		{
+			name = "Captured source input supplied separately to run_embedded",
+			text = payload.source.text,
+		},
+		{
+			name = "Baseline instruction",
+			text = payload.baseline_instruction,
+		},
+	}
+
+	if payload.document then
+		sections[#sections + 1] = {
+			name = "Captured supplementary document; inclusion is reported in metadata",
+			text = payload.document.text,
+		}
+	end
+
+	-- Pick boundaries absent from every stored content section.
+	local boundary
+	local index = 0
+	repeat
+		boundary = "<<<AIDE_EXPLAIN_INSPECTION_" .. index .. "_"
+		index = index + 1
+		local collision = false
+		for _, section in ipairs(sections) do
+			if section.text:find(boundary, 1, true) then
+				collision = true
+				break
+			end
+		end
+		if not collision then
+			break
+		end
+	until false
+
+	local lines = {
+		"Neovim-AIDE application-supplied context",
+		"",
+		"WARNING: This report may contain sensitive source and project-document content.",
+		"Session-local view. Nothing is automatically exported or copied to the clipboard.",
+		"",
+		"This is not complete Codex context or evidence of effective execution permissions.",
+		"Instruction and source are separate application inputs; the runner adds its source envelope.",
+		"All identities below were captured; inspection does not revalidate their current state.",
+		"Refresh occurs only when :CodexExplainContext is invoked.",
+		"",
+		"Content display:",
+		"- Stored strings are copied without trimming, newline conversion or prompt regeneration.",
+		"- LF bytes separate buffer lines; CR and TAB bytes remain in those lines.",
+		"- Visible list characters are display aids, not stored content.",
+		"- Trailing empty lines are retained before each END boundary.",
+		"- Boundary lines and their separating line breaks are report framing.",
+		"- Byte counts and hashes describe stored strings, not this report as an export format.",
+		"",
+		"Callback-observed outcome: " .. vim.json.encode(outcome),
+	}
+
+	if outcome.status == "submission_requested" then
+		lines[#lines + 1] = "Submission was requested; no completion notification has been received."
+		lines[#lines + 1] = "This does not establish whether a child is waiting, running or health-blocked."
+	end
+
+	local function add_metadata(label, value)
+		lines[#lines + 1] = label .. ": " .. (value == nil and "not recorded" or vim.json.encode(value))
+	end
+
+	lines[#lines + 1] = ""
+	add_metadata("Operation", payload.operation)
+	add_metadata("Capture timestamp", payload.captured_at)
+	add_metadata("Submission timestamp", payload.submitted_at)
+	add_metadata("Captured context-enabled decision", payload.context_enabled)
+	add_metadata("Source identity", metadata_without_text(payload.source))
+	add_metadata("Captured prompt policy", payload.prompt_policy)
+	add_metadata("Captured Git repository", payload.repository)
+	add_metadata("Captured execution location", payload.execution_location)
+	add_metadata("Supplementary status", payload.supplement_status)
+	add_metadata("Selected document path", payload.selected_document_path)
+	add_metadata("Captured document metadata", metadata_without_text(payload.document))
+	add_metadata("Document omission", payload.document_omission)
+
+	for number, section in ipairs(sections) do
+		lines[#lines + 1] = ""
+		lines[#lines + 1] = section.name
+		lines[#lines + 1] = "Stored bytes: " .. #section.text
+		lines[#lines + 1] = "SHA-256 of stored bytes: " .. vim.fn.sha256(section.text)
+		lines[#lines + 1] = boundary .. "BEGIN_" .. number .. ">>>"
+
+		for _, line in ipairs(vim.split(section.text, "\n", { plain = true, trimempty = false })) do
+			lines[#lines + 1] = line
+		end
+
+		lines[#lines + 1] = boundary .. "END_" .. number .. ">>>"
+	end
+
+	local name = "codex://explain-context"
+	local existing = vim.fn.bufnr(name)
+	local visible_window
+
+	if existing ~= -1 and vim.api.nvim_buf_is_valid(existing) then
+		-- Disable undo before replacing any earlier sensitive report.
+		vim.bo[existing].undofile = false
+		vim.bo[existing].undolevels = -1
+
+		local current_window = vim.api.nvim_get_current_win()
+		for _, win in ipairs(vim.fn.win_findbuf(existing)) do
+			if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == existing then
+				if not visible_window or win == current_window then
+					visible_window = win
+				end
+			end
+		end
+	end
+
+	local bufnr
+	if visible_window then
+		-- This also selects the target tab when necessary.
+		local focused = pcall(vim.api.nvim_set_current_win, visible_window)
+		if
+			not focused
+			or not vim.api.nvim_win_is_valid(visible_window)
+			or vim.api.nvim_get_current_win() ~= visible_window
+			or vim.api.nvim_win_get_buf(visible_window) ~= existing
+		then
+			vim.notify("Explain context view could not be focused. Please retry.", vim.log.levels.WARN, {
+				title = "Codex",
+			})
+			return
+		end
+
+		bufnr = existing
+		vim.bo[bufnr].buftype = "nofile"
+		vim.bo[bufnr].bufhidden = "wipe"
+		vim.bo[bufnr].swapfile = false
+		vim.bo[bufnr].filetype = ""
+
+		vim.bo[bufnr].readonly = false
+		vim.bo[bufnr].modifiable = true
+		local updated = pcall(vim.api.nvim_buf_set_lines, bufnr, 0, -1, false, lines)
+
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			vim.bo[bufnr].modifiable = false
+			vim.bo[bufnr].readonly = true
+		end
+
+		if not updated or not vim.api.nvim_buf_is_valid(bufnr) then
+			vim.notify("Explain context view could not be refreshed. Please retry.", vim.log.levels.WARN, {
+				title = "Codex",
+			})
+			return
+		end
+	else
+		bufnr = require("codex.window").open({
+			name = name,
+			lines = lines,
+			filetype = "",
+			close_desc = "Close Explain context inspection",
+		})
+	end
+
+	vim.bo[bufnr].undofile = false
+	vim.bo[bufnr].undolevels = -1
+	vim.bo[bufnr].buflisted = false
+	vim.bo[bufnr].syntax = ""
+
+	vim.wo.conceallevel = 0
+	vim.wo.wrap = false
+	vim.wo.spell = false
+	vim.wo.foldenable = false
+	vim.wo.list = true
+	vim.wo.listchars = "tab:>-,trail:.,eol:$,nbsp:+"
+end
+
 function M.show_context()
 	local context = require("codex.context")
 	local window = require("codex.window")
@@ -1872,6 +2374,11 @@ function M.explain_failure()
 		return
 	end
 
+	local recovery_metadata_only
+	if failure_report.recovery_metadata_only == true or failure_report.output_persistence == "metadata_only" then
+		recovery_metadata_only = true
+	end
+
 	set_state_running("explain_failure", 0, "Explaining last captured failure")
 
 	local prompt = table.concat({
@@ -1892,6 +2399,7 @@ function M.explain_failure()
 	require("codex.runner").run({
 		op = "explain_failure",
 		prompt = prompt,
+		recovery_metadata_only = recovery_metadata_only,
 		spinner_message = "Codex [explain_failure] working…",
 		filetype = "text",
 		on_success = function(result)
@@ -2028,6 +2536,13 @@ pcall(vim.api.nvim_del_user_command, "CodexRepeat")
 vim.api.nvim_create_user_command("CodexRepeat", function()
 	require("codex_cli").repeat_last_op()
 end, {})
+
+pcall(vim.api.nvim_del_user_command, "CodexExplainContext")
+vim.api.nvim_create_user_command("CodexExplainContext", function()
+	require("codex_cli").show_explain_context()
+end, {
+	desc = "Inspect latest submitted current-buffer Explain inputs",
+})
 
 pcall(vim.api.nvim_del_user_command, "CodexContext")
 vim.api.nvim_create_user_command("CodexContext", function()

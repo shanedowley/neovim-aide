@@ -51,7 +51,60 @@ local function has_meaningful_lines(lines)
 	return false
 end
 
+local function metadata_only_recovery(record)
+	return record.recovery_metadata_only == true or record.output_persistence == "metadata_only"
+end
+
+local function recovery_metadata(record)
+	local metadata = {
+		output_persistence = "metadata_only",
+		output_available = false,
+		kind = failure.kinds.unknown_failure,
+	}
+
+	local kind = record.kind
+	if type(kind) == "string" and failure.kinds[kind] == kind then
+		metadata.kind = kind
+	end
+
+	-- Attribution fields must come from application-controlled request metadata.
+	for _, key in ipairs({
+		"stage",
+		"op",
+		"mode",
+		"file",
+		"filetype",
+		"request_id",
+		"prompt_version",
+		"updated_at",
+	}) do
+		if type(record[key]) == "string" then
+			metadata[key] = record[key]
+		end
+	end
+
+	for _, key in ipairs({ "latency_ms", "exit_code" }) do
+		local value = record[key]
+		if type(value) == "number" and value == value and value > -math.huge and value < math.huge then
+			metadata[key] = value
+		end
+	end
+
+	-- Never persist a caller-supplied free-text reason.
+	metadata.reason = metadata.kind
+
+	return metadata
+end
+
 local function suggested_actions_for_failure(f)
+	if metadata_only_recovery(f) and f.output_available == false then
+		return {
+			"Raw diagnostic output was deliberately not persisted.",
+			"Check :CodexLog for request timing and status metadata.",
+			"Retry the original operation to obtain fresh diagnostics.",
+		}
+	end
+
 	local kind = failure.normalize(f.kind)
 	local actions = {}
 
@@ -117,6 +170,17 @@ local function render_failure_lines(f)
 		"",
 	}
 
+	if metadata_only_recovery(f) then
+		if f.output_available == false then
+			lines[#lines + 1] = "Raw diagnostic output was deliberately not persisted."
+			lines[#lines + 1] = "Only recovery metadata is available for this restored record."
+		else
+			lines[#lines + 1] = "Full diagnostic output is available in this session only."
+			lines[#lines + 1] = "Only recovery metadata is persisted."
+		end
+		lines[#lines + 1] = ""
+	end
+
 	local stderr = f.stderr or {}
 	if has_meaningful_lines(stderr) then
 		lines[#lines + 1] = "## STDERR"
@@ -175,12 +239,13 @@ local function normalize_lines_payload(lines)
 	return { "No diagnostic output available." }
 end
 
-local function write_last_failure(failure)
+local function write_last_failure(record)
 	local path = failure_store_path()
-	local json = vim.json.encode(failure)
+	local persisted = metadata_only_recovery(record) and recovery_metadata(record) or record
+	local json = vim.json.encode(persisted)
 
 	vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
-	vim.fn.writefile({ json }, path)
+	return vim.fn.writefile({ json }, path) == 0
 end
 
 local function read_last_failure()
@@ -202,11 +267,18 @@ local function read_last_failure()
 		return nil
 	end
 
+	if metadata_only_recovery(decoded) then
+		return recovery_metadata(decoded)
+	end
+
 	return decoded
 end
 
 function M.capture(opts)
 	opts = opts or {}
+
+	local protected = metadata_only_recovery(opts)
+	local unavailable = protected and opts.output_available == false
 
 	last_failure = {
 		kind = failure.normalize(opts.kind),
@@ -223,15 +295,28 @@ function M.capture(opts)
 		exit_code = opts.exit_code,
 		prompt_version = opts.prompt_version,
 
-		stdout = normalize_lines_payload(opts.stdout),
-		stderr = normalize_lines_payload(opts.stderr),
+		stdout = not unavailable and normalize_lines_payload(opts.stdout) or nil,
+		stderr = not unavailable and normalize_lines_payload(opts.stderr) or nil,
 
 		title = opts.title or "Codex Failure",
-		lines = normalize_lines_payload(opts.lines),
+		lines = not unavailable and normalize_lines_payload(opts.lines) or nil,
 		updated_at = now_string(),
 	}
 
-	pcall(write_last_failure, last_failure)
+	if protected then
+		last_failure.output_persistence = "metadata_only"
+		last_failure.output_available = not unavailable
+		last_failure = copy(last_failure)
+	end
+
+	local ok, written = pcall(write_last_failure, last_failure)
+	if protected and (not ok or written ~= true) then
+		vim.notify(
+			"Codex recovery metadata could not be saved. The latest record is available in this session only.",
+			vim.log.levels.WARN,
+			{ title = "Codex" }
+		)
+	end
 
 	return copy(last_failure)
 end
@@ -293,6 +378,11 @@ end
 function M.can_explain_with_codex(failure_report)
 	if not failure_report then
 		return false, "No failure has been captured."
+	end
+
+	if metadata_only_recovery(failure_report) and failure_report.output_available == false then
+		return false,
+			"Raw diagnostic output was deliberately not persisted. Retry the original operation for fresh diagnostics."
 	end
 
 	local kind = failure.normalize(failure_report.kind)

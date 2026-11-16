@@ -592,6 +592,336 @@ function M.validate_execution_location(location)
 	}
 end
 
+-- Strict UTF-8 validation: Neovim's UTF indexing functions tolerate invalid bytes.
+local function document_is_utf8(text)
+	local i = 1
+	while i <= #text do
+		local first = text:byte(i)
+		local length
+		local second_min, second_max = 0x80, 0xBF
+
+		if first < 0x80 then
+			length = 1
+		elseif first >= 0xC2 and first <= 0xDF then
+			length = 2
+		elseif first >= 0xE0 and first <= 0xEF then
+			length = 3
+			if first == 0xE0 then
+				second_min = 0xA0
+			elseif first == 0xED then
+				second_max = 0x9F
+			end
+		elseif first >= 0xF0 and first <= 0xF4 then
+			length = 4
+			if first == 0xF0 then
+				second_min = 0x90
+			elseif first == 0xF4 then
+				second_max = 0x8F
+			end
+		else
+			return false
+		end
+
+		if i + length - 1 > #text then
+			return false
+		end
+
+		if length > 1 then
+			local second = text:byte(i + 1)
+			if second < second_min or second > second_max then
+				return false
+			end
+			for offset = 2, length - 1 do
+				local byte = text:byte(i + offset)
+				if byte < 0x80 or byte > 0xBF then
+					return false
+				end
+			end
+		end
+
+		i = i + length
+	end
+	return true
+end
+
+local function document_file_identity(stat)
+	return type(stat) == "table"
+		and stat.type == "file"
+		and execution_identity_number(stat.dev)
+		and execution_identity_number(stat.ino)
+		and stat.ino > 0
+		and execution_identity_number(stat.size)
+		and type(stat.mtime) == "table"
+		and type(stat.ctime) == "table"
+		and type(stat.mtime.sec) == "number"
+		and type(stat.mtime.nsec) == "number"
+		and type(stat.ctime.sec) == "number"
+		and type(stat.ctime.nsec) == "number"
+end
+
+local function same_document_file(left, right)
+	return document_file_identity(left)
+		and document_file_identity(right)
+		and left.dev == right.dev
+		and left.ino == right.ino
+		and left.size == right.size
+		and left.mtime.sec == right.mtime.sec
+		and left.mtime.nsec == right.mtime.nsec
+		and left.ctime.sec == right.ctime.sec
+		and left.ctime.nsec == right.ctime.nsec
+end
+
+local function document_open_flags()
+	local uv = vim.uv or vim.loop
+	local constants = uv.constants
+	if type(constants) ~= "table" then
+		return nil
+	end
+
+	local function valid_flag(value)
+		return type(value) == "number" and value >= 0 and value <= 0x7FFFFFFF and value == math.floor(value)
+	end
+
+	local readonly = constants.O_RDONLY
+	local nonblock = constants.O_NONBLOCK
+	if not valid_flag(readonly) or readonly ~= 0 or not valid_flag(nonblock) or nonblock == 0 then
+		return nil
+	end
+
+	local nofollow = constants.O_NOFOLLOW
+	if nofollow ~= nil and not valid_flag(nofollow) then
+		return nil
+	end
+
+	if nofollow == nil or nofollow == 0 then
+		if type(uv.os_uname) ~= "function" then
+			return nil
+		end
+
+		local ok, platform = pcall(uv.os_uname)
+		if not ok or type(platform) ~= "table" then
+			return nil
+		end
+
+		-- Native open(2) ABI values, isolated here because luv may omit O_NOFOLLOW.
+		if platform.sysname == "Darwin" and (platform.machine == "arm64" or platform.machine == "x86_64") then
+			nofollow = 0x100
+		elseif platform.sysname == "Linux" and (platform.machine == "x86_64" or platform.machine == "i686") then
+			nofollow = 0x20000
+		else
+			return nil
+		end
+	end
+
+	return bit.bor(readonly, nonblock, nofollow)
+end
+
+-- opts.native_instruction_filenames supplies any known configured fallback names.
+-- This function does not discover Codex configuration or native instructions.
+function M.capture_document(repository, relative_path, opts)
+	local uv = vim.uv or vim.loop
+	local started = uv.hrtime()
+	local captured_at = os.time()
+	local resolved_path
+	local observed_size
+	local read_bytes = 0
+	local limit = 16384
+
+	local function elapsed_ms()
+		return (uv.hrtime() - started) / 1e6
+	end
+
+	local function omit(code, message)
+		return nil,
+			{
+				status = "omitted",
+				code = code,
+				message = message,
+				selected_path = type(relative_path) == "string" and relative_path or nil,
+				resolved_path = resolved_path,
+				observed_size = observed_size,
+				read_bytes = read_bytes,
+				supplied_bytes = 0,
+				limit_bytes = limit,
+				captured_at = captured_at,
+				preparation_ms = elapsed_ms(),
+			}
+	end
+
+	if relative_path == nil then
+		return omit("not_selected", "No supplementary document selected.")
+	end
+
+	if
+		type(relative_path) ~= "string"
+		or relative_path == ""
+		or relative_path:sub(1, 1) == "/"
+		or relative_path:find("\\", 1, true)
+		or relative_path:find("[%z\1-\31\127]")
+	then
+		return omit("invalid_document_path", "Select a repository-relative document path.")
+	end
+
+	-- Reject ambiguous spelling rather than normalising traversal or empty components.
+	for component in (relative_path .. "/"):gmatch("(.-)/") do
+		if component == "" or component == "." or component == ".." then
+			return omit("invalid_document_path", "Document path contains an invalid path component.")
+		end
+	end
+
+	opts = opts or {}
+	if type(opts) ~= "table" then
+		return omit("invalid_document_options", "Supplementary document options are invalid.")
+	end
+
+	local excluded_names = {
+		["agents.md"] = true,
+		["agents.override.md"] = true,
+	}
+	local fallback_names = opts.native_instruction_filenames or {}
+	if type(fallback_names) ~= "table" then
+		return omit("invalid_document_options", "Native instruction filename exclusions are invalid.")
+	end
+	for _, name in pairs(fallback_names) do
+		if type(name) ~= "string" or name == "" or name == "." or name == ".." or name:find("[/\\%z\1-\31\127]") then
+			return omit("invalid_document_options", "A native instruction filename exclusion is invalid.")
+		end
+		excluded_names[name:lower()] = true
+	end
+
+	local function excluded(path)
+		return excluded_names[vim.fn.fnamemodify(path, ":t"):lower()] == true
+	end
+
+	if excluded(relative_path) then
+		return omit("native_instruction_document", "Native Codex instruction files are not supplementary context.")
+	end
+
+	if type(repository) ~= "table" then
+		return omit("invalid_document_repository", "Captured Git worktree identity is unavailable.")
+	end
+	local root, root_error = execution_directory_identity(repository.worktree_root)
+	if not root then
+		return omit("document_worktree_unavailable", root_error.message)
+	end
+
+	local prefix = root.path == "/" and "/" or root.path .. "/"
+	local selected_path = prefix .. relative_path
+	resolved_path = uv.fs_realpath(selected_path)
+	if not resolved_path then
+		return omit("document_unavailable", "Supplementary document is missing, inaccessible or unresolved.")
+	end
+
+	if resolved_path:sub(1, #prefix) ~= prefix then
+		return omit("document_outside_worktree", "Supplementary document target is outside the captured worktree.")
+	end
+	if excluded(resolved_path) then
+		return omit("native_instruction_document", "Supplementary document resolves to a native instruction file.")
+	end
+
+	local before = uv.fs_stat(resolved_path)
+	if not before then
+		return omit("document_unavailable", "Supplementary document cannot be inspected.")
+	end
+	if before.type ~= "file" then
+		return omit("document_not_regular", "Supplementary document must be a regular file.")
+	end
+	if not document_file_identity(before) then
+		return omit("document_identity_unsupported", "Supplementary document filesystem identity cannot be verified.")
+	end
+	observed_size = before.size
+	if before.size > limit then
+		return omit("document_oversized", "Supplementary document exceeds the 16,384-byte limit.")
+	end
+
+	-- Avoid following a substituted final symlink or blocking on a substituted FIFO.
+	local flags = document_open_flags()
+	if flags == nil then
+		return omit("document_open_unsupported", "Safe supplementary document opening is unsupported on this platform.")
+	end
+
+	local fd = uv.fs_open(resolved_path, flags, 0)
+	if not fd then
+		return omit("document_unreadable", "Supplementary document could not be opened read-only.")
+	end
+
+	-- All operations after opening are protected so the descriptor is always closed.
+	local ok, text, failure_code, failure_message = pcall(function()
+		local opened = uv.fs_fstat(fd)
+		if not same_document_file(before, opened) then
+			return nil, "document_changed", "Supplementary document changed before reading."
+		end
+
+		local chunks = {}
+		while read_bytes <= limit do
+			local chunk = uv.fs_read(fd, limit + 1 - read_bytes, read_bytes)
+			if type(chunk) ~= "string" then
+				return nil, "document_read_failed", "Supplementary document could not be read."
+			end
+			if chunk == "" then
+				break
+			end
+			read_bytes = read_bytes + #chunk
+			if read_bytes > limit then
+				return nil, "document_oversized", "Supplementary document exceeds the 16,384-byte limit."
+			end
+			chunks[#chunks + 1] = chunk
+		end
+
+		local after = uv.fs_fstat(fd)
+		local current = uv.fs_stat(resolved_path)
+		local root_matches = match_execution_directory(root)
+		if
+			not same_document_file(opened, after)
+			or not same_document_file(after, current)
+			or read_bytes ~= after.size
+			or uv.fs_realpath(selected_path) ~= resolved_path
+			or uv.fs_realpath(resolved_path) ~= resolved_path
+			or not root_matches
+		then
+			return nil, "document_changed", "Supplementary document or worktree changed during capture."
+		end
+
+		return table.concat(chunks)
+	end)
+
+	local closed, close_result = pcall(uv.fs_close, fd)
+	if not closed or not close_result then
+		return omit("document_close_failed", "Supplementary document descriptor could not be closed cleanly.")
+	end
+	if not ok then
+		return omit("document_read_failed", "Supplementary document capture encountered a filesystem error.")
+	end
+	if text == nil then
+		return omit(failure_code, failure_message)
+	end
+
+	if not document_is_utf8(text) then
+		return omit("document_invalid_utf8", "Supplementary document is not valid UTF-8 text.")
+	end
+	-- Permit TAB, LF and CR; reject NUL, other ASCII controls and DEL.
+	if text:find("[%z\1-\8\11\12\14-\31\127]") then
+		return omit("document_binary", "Supplementary document contains disallowed control bytes.")
+	end
+
+	return {
+		status = "included",
+		selected_path = relative_path,
+		resolved_path = resolved_path,
+		worktree_root = root.path,
+		relative_file = resolved_path:sub(#prefix + 1),
+		text = text,
+		sha256 = vim.fn.sha256(text),
+		byte_count = #text,
+		read_bytes = read_bytes,
+		supplied_bytes = #text,
+		limit_bytes = limit,
+		captured_at = captured_at,
+		preparation_ms = elapsed_ms(),
+	},
+		nil
+end
+
 local function marker_type(name)
 	if name == ".git" then
 		return "directory"

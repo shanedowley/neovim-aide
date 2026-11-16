@@ -94,7 +94,7 @@ local function fence_lang(filetype)
 	return filetype or ""
 end
 
-local function block_for_health_failure(opts, reason)
+local function block_for_health_failure(opts, reason, recovery_metadata_only, captured_metadata, request_id)
 	local op = opts.op or "codex_run"
 
 	log_event(
@@ -112,8 +112,12 @@ local function block_for_health_failure(opts, reason)
 			kind = reason,
 			stage = "preflight",
 			op = op,
-			mode = nil,
-			file = nil,
+			recovery_metadata_only = recovery_metadata_only,
+			mode = recovery_metadata_only == true and captured_metadata and captured_metadata.mode or nil,
+			file = recovery_metadata_only == true and captured_metadata and captured_metadata.file or nil,
+			prompt_version = recovery_metadata_only == true and captured_metadata and captured_metadata.prompt_version
+				or nil,
+			request_id = recovery_metadata_only == true and request_id or nil,
 			reason = "Codex blocked because healthcheck is not PASS",
 			title = "Codex Blocked",
 			lines = {
@@ -131,6 +135,7 @@ end
 function M.run(opts)
 	opts = opts or {}
 
+	local recovery_metadata_only = opts.recovery_metadata_only
 	local execution_directory = opts.execution_directory
 	local validate_execution_directory = opts.validate_execution_directory
 	local has_execution_directory = execution_directory ~= nil or validate_execution_directory ~= nil
@@ -165,14 +170,14 @@ function M.run(opts)
 
 	local execution_directory_failed = false
 
-	local function fail_execution_directory(reason, message)
+	local function fail_execution_directory(reason, message, failure_stage)
 		if execution_directory_failed then
 			return
 		end
 		execution_directory_failed = true
 
 		local request_mode, request_file = running_identity()
-		local stage = "execution_directory_validation"
+		local stage = failure_stage or "execution_directory_validation"
 
 		log_event(
 			"fail",
@@ -228,6 +233,15 @@ function M.run(opts)
 
 	ui.start(spinner_message)
 
+	if recovery_metadata_only ~= nil and type(recovery_metadata_only) ~= "boolean" then
+		fail_execution_directory(
+			"invalid_recovery_policy",
+			"Codex recovery_metadata_only must be a boolean when supplied.",
+			"request_options_validation"
+		)
+		return
+	end
+
 	if has_execution_directory then
 		if
 			type(execution_directory) ~= "string"
@@ -266,7 +280,14 @@ function M.run(opts)
 	vim.defer_fn(function()
 		if opts._force_health_fail_for_test then
 			persistent_health_cache.write({ status = "FAIL" })
-			block_for_health_failure(opts, "healthcheck_not_pass")
+			block_for_health_failure(
+				opts,
+				"healthcheck_not_pass",
+				recovery_metadata_only,
+				captured_metadata,
+				request_id
+			)
+
 			if stream_output and stream_bufnr then
 				output.fail(stream_bufnr, { "Codex blocked: healthcheck is not PASS." })
 			end
@@ -337,7 +358,7 @@ function M.run(opts)
 
 		if not ok_health or not healthy then
 			local reason = ok_health and "healthcheck_not_pass" or "healthcheck_error"
-			block_for_health_failure(opts, reason)
+			block_for_health_failure(opts, reason, recovery_metadata_only, captured_metadata, request_id)
 
 			if stream_output and stream_bufnr then
 				output.fail(stream_bufnr, {
@@ -584,7 +605,16 @@ function M.run(opts)
 								kind = "codex_exec_failed",
 								stage = "codex_exec",
 								op = op,
-								request_id = opts.request_id,
+								recovery_metadata_only = recovery_metadata_only,
+								mode = recovery_metadata_only == true and captured_metadata and captured_metadata.mode
+									or nil,
+								file = recovery_metadata_only == true and captured_metadata and captured_metadata.file
+									or nil,
+								prompt_version = recovery_metadata_only == true
+										and captured_metadata
+										and captured_metadata.prompt_version
+									or nil,
+								request_id = request_id,
 								latency_ms = latency_ms,
 								exit_code = code,
 								filetype = opts.filetype,
